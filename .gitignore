@@ -1,5 +1,6 @@
 #Mine
 json/
+.env
 
 # Logs
 logs
