@@ -2,20 +2,18 @@ const ObjectId = require('mongodb').ObjectID;
 const Postulante = require('../models/postulante');
 
 exports.addPostulante = (req, res, next) => {
-  const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
-  const description = req.body.description;
-  const postulante = new Postulante(title, imageUrl, price, description);
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const postulante = new Postulante(email, password,'','','','','','','','','','',false,'');
   postulante.save()
     .then(result => {
-      // console.log(result);
-      console.log('Postulante created!');
-    //   res.redirect('/admin/products');
-        res.status(200).end()
+      console.log(result);
+        res.status(200).json(result);
     })
     .catch(err => {
-      console.log(err);
+      console.log(err.code);
+      res.status(500).json({success: false, message: 'Error de comunicación con el servidor'});
     });
 };
 

@@ -2,8 +2,10 @@ const ObjectId = require('mongodb').ObjectId;
 const getDB = require('../util/database').getDb;
 
 class Postulante {
-  constructor(docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
-    nacionalidad,telefono,direccion,pais,departamento,ciudad,id) {
+  constructor(email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
+    nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,id) {
+    this.email = email;
+    this.password = password;
     this.docNro = docNro;
     this.nombreCompleto = nombreCompleto;
     this.estadoCivil = estadoCivil;
@@ -15,7 +17,8 @@ class Postulante {
     this.pais = pais;
     this.departamento = departamento;
     this.ciudad = ciudad;
-    this._id = ObjectId(id);
+    this.emailValidated = emailValidated;
+    this._id = id ? ObjectId(id) : null;
     
   }
 
@@ -34,10 +37,12 @@ class Postulante {
     }
     return dbOp
       .then(result => {
-        console.log(result);
+        // console.log(result);
+        return {success: true, message: 'Postulante creado con éxito'};
       })
       .catch(err => {
-        console.log('Error en save: ',err);
+        const message = err.code === 11000 ? 'El email ya existe' : 'Error al guardar el postulante'; 
+        return {success: false, message};
       });
   }
 
