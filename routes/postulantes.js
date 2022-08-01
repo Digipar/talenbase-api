@@ -6,5 +6,6 @@ const postulantesController = require('../controllers/postulantes');
 router.get('/', postulantesController.getPostulantes);
 /* REGISTER NEW POSTULANTE */
 router.post('/register', postulantesController.addPostulante);
+router.put('/activate/:id?', postulantesController.activatePostulante);
 
 module.exports = router;

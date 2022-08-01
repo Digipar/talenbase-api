@@ -17,6 +17,17 @@ exports.addPostulante = (req, res, next) => {
     });
 };
 
+exports.activatePostulante = (req, res, next) => {
+  console.log('Activar postulante req.params.id', req.params.id)
+  Postulante
+    .findById(req.params.id)
+    .then(postulante => {
+      console.log('postulante', postulante)
+      // res.status(200).json(postulante);
+    })
+    .catch(err => console.log(err));
+};
+
 exports.editProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
