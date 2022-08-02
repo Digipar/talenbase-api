@@ -38,7 +38,7 @@ class Postulante {
     return dbOp
       .then(result => {
         // console.log(result);
-        return {success: true, message: 'Postulante creado con éxito'};
+        return {success: true, message: `Postulante ${this._id ? 'actualizado' : 'creado'} con éxito`};
       })
       .catch(err => {
         const message = err.code === 11000 ? 'El email ya existe' : 'Error al guardar el postulante'; 
@@ -61,16 +61,18 @@ class Postulante {
   }
 
   static findById(id) {
+    console.log('go to find:', id)
     const db=getDB();
     return db.collection('postulantes')
-      .find({_id: ObjectId(id)})
+      .find({_id: id})
       .next()
       .then(postulante => {
-        console.log(postulante);
+        console.log('find postulante: ',postulante);
         return postulante;
       })
       .catch(err => {
         console.log(err);
+        return -1
       });
   }
 
