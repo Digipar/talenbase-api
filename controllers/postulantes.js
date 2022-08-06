@@ -1,84 +1,95 @@
 const ObjectId = require("mongodb").ObjectID;
 const Postulante = require("../models/postulante");
+require("dotenv").config();
 // import { BSONTypeError } from "bson";
 
 exports.addPostulante = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const nombreCompleto = req.body.nombreCompleto;
 
   const postulante = new Postulante(
     email,
     password,
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
+    null,
+    nombreCompleto,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
     false,
-    ""
+    null,
+    null
   );
   postulante
     .save()
     .then((result) => {
       console.log(result);
+      console.log(`http://${process.env.APP_HOST}/validate-email/${result.id}`);
       res.status(200).json(result);
     })
     .catch((err) => {
       console.log(err.code);
       res.status(500).json({
         success: false,
-        message: "Error de comunicación con el servidor",
+        message: "COMMUNICATION_ERROR",
       });
     });
 };
 
-exports.activatePostulante = (req, res, next) => {
-  console.log("Activar postulante req.params.id", req.params.id);
-  let id = ObjectId(req.params.id);
+const update = (id,postulanteData,action,res) => {
   Postulante.findById(id)
-    .then((encontrado) => {
-      console.log("encontrado", encontrado);
-      if (encontrado) {
-        // activate
-        const postulante = new Postulante(
-          encontrado.email,
-          encontrado.password,
-          encontrado.docNro,
-          encontrado.nombreCompleto,
-          encontrado.estadoCivil,
-          encontrado.sexo,
-          encontrado.fechaNacimiento,
-          encontrado.nacionalidad,
-          encontrado.telefono,
-          encontrado.direccion,
-          encontrado.pais,
-          encontrado.departamento,
-          encontrado.ciudad,
-          true,
-          id
-        );
+    .then((r) => {
+      console.log("encontrado", r);
+      if (r) {
+        r = {...r, ...postulanteData};
+        console.log('r', r)
+        const postulante = new Postulante(r.email,r.password,r.docNro,r.nombreCompleto,r.estadoCivil,r.sexo,r.fechaNacimiento,
+        r.nacionalidad,r.telefono,r.direccion,r.pais,r.departamento,r.ciudad,
+        action=='ACTIVATE' ? true : r.emailActivated,r.sharepointId,r._id.toString());
+        
+        
         postulante
           .save()
           .then((result) => {
-            console.log("Activado postulante");
+            console.log( `Postulante ${action}D`);
             res.status(200).json(result);
           })
           .catch((err) => console.log(err));
       } else {
         console.log('no encontrado')
-        res.status(404).send({success: false, message: 'No encontrado'});
+        res.status(401).send({success: false, message: 'INVALID_USER'});
+        // .send({success: false, message: 'No encontrado'});
       }
     })
     .catch((err) => {
       console.log("Ups: ", err);
       // return -1;
-      res.status(404);
+      res.status(404).send({success: false, message: 'No encontrado'});
     });
+}
+
+exports.activatePostulante = (req, res, next) => {
+  console.log("Activar postulante req.params.id", req.params.id);
+  let id = ObjectId(req.params.id);
+  update(id,null,'ACTIVATE',res)  
+};
+exports.updatePostulante = (req, res, next) => {
+  console.log("Update postulante req.userId", req.userId);
+  console.log("Update postulante body", req.body);
+  let id = ObjectId(req.userId);
+  let postulanteData = req.body;
+  if(postulanteData){
+    update(id,postulanteData,'UPDATE',res)
+  }else{
+    // To Do: this case could be validated in the route definition
+    res.status(404).send({success: false, message: 'NO_DATA_RECEIVED'});
+  }
 };
 
 exports.editProduct = (req, res, next) => {
