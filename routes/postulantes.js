@@ -5,6 +5,7 @@ const { authJwt } = require('../middleware');
 
 /* GET postulantes listing. */
 router.get('/', postulantesController.getPostulantes);
+router.get('/:email', postulantesController.getPostulante);
 /* REGISTER NEW POSTULANTE */
 /* TO DO: move this route to auth.js */
 router.post('/register', postulantesController.addPostulante);
@@ -15,6 +16,6 @@ router.put('/update', [authJwt.verifyToken], postulantesController.updatePostula
 
 router.use(function(req, res, next) {
     console.log('error 404 por código inválido');
-    res.status(404).send({success: false, message: 'ACTIVATION_CODE_INVALID'});
+    res.status(404).send({success: false, message: 'CODE_INVALID'});
   });
 module.exports = router;

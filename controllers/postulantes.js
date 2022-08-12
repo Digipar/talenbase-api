@@ -124,6 +124,14 @@ exports.getPostulantes = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+exports.getPostulante = (req, res, next) => {
+  Postulante.findByEmail(req.params.email)
+    .then((postulante) => {
+      res.status(200).json(postulante);
+    })
+    .catch((err) => console.log(err));
+};
+
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   Product.deleteById(prodId)

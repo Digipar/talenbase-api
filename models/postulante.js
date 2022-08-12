@@ -86,6 +86,21 @@ class Postulante {
         return -1
       });
   }
+  static findByEmail(email) {
+    console.log('go to find:', email)
+    const db=getDB();
+    return db.collection('postulantes')
+      .find({email: email})
+      .next()
+      .then(postulante => {
+        console.log('find postulante: ',postulante);
+        return postulante;
+      })
+      .catch(err => {
+        console.log(err);
+        return -1
+      });
+  }
 
   static find(filter) {
     console.log('go to find:', filter)
