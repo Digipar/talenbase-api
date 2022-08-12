@@ -94,7 +94,8 @@ class Postulante {
       .next()
       .then(postulante => {
         console.log('find postulante: ',postulante);
-        return postulante;
+        const { password, ...postulanteNoPass } = postulante;
+        return postulanteNoPass;
       })
       .catch(err => {
         console.log(err);

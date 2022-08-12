@@ -11,20 +11,20 @@ exports.addPostulante = (req, res, next) => {
   const postulante = new Postulante(
     email,
     password,
-    null,
+    "",
     nombreCompleto,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
     false,
-    null,
-    null
+    "",
+    ""
   );
   postulante
     .save()

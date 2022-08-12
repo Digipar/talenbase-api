@@ -3,6 +3,7 @@ const router = express.Router();
 const postulantesController = require('../controllers/postulantes');
 const { authJwt } = require('../middleware');
 
+/* To Do: validate JWT token */
 /* GET postulantes listing. */
 router.get('/', postulantesController.getPostulantes);
 router.get('/:email', postulantesController.getPostulante);
