@@ -24,7 +24,12 @@ exports.addPostulante = (req, res, next) => {
     "",
     false,
     "",
-    ""
+    "",
+    [],
+    [],
+    [],
+    [],
+    []
   );
   postulante
     .save()
@@ -51,7 +56,7 @@ const update = (id,postulanteData,action,res) => {
         console.log('r', r)
         const postulante = new Postulante(r.email,r.password,r.docNro,r.nombreCompleto,r.estadoCivil,r.sexo,r.fechaNacimiento,
         r.nacionalidad,r.telefono,r.direccion,r.pais,r.departamento,r.ciudad,
-        action=='ACTIVATE' ? true : r.emailActivated,r.sharepointId,r._id.toString());
+        action=='ACTIVATE' ? true : r.emailActivated,r.sharepointId,r._id.toString(),[],[],[],[],[]);
         
         
         postulante
