@@ -21,6 +21,10 @@ const update = (id, postulanteData, action, res) => {
             encontrado = { ...encontrado, postulanteData };
 
             break;
+          case "LANGUAGE":
+            encontrado = { ...encontrado, postulanteData };
+
+            break;
 
           default:
             break;

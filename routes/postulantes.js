@@ -11,6 +11,7 @@ router.get('/:email', postulantesController.getPostulante);
 /* UPDATE POSTULANTE */
 router.put('/update', [authJwt.verifyToken], postulantesController.updatePostulante);
 router.put('/update-academic-data', [authJwt.verifyToken], postulantesController.updateAcademicData);
+router.put('/update-language-data', [authJwt.verifyToken], postulantesController.updateLanguageData);
 
 router.use(function(req, res, next) {
     console.log('error 404 por código inválido');
