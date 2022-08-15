@@ -49,6 +49,33 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.register = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  const nombreCompleto = req.body.nombreCompleto;
+
+  const user = new User(
+    null,email,password,"",nombreCompleto,
+    "","","","","","",
+    "",    "",    "",    false,
+    "",  [],    [],    [],    [],  []
+  );
+  user.save()
+    .then((result) => {
+      console.log(result);
+      console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
+      res.status(200).json(result);
+    })
+    .catch((err) => {
+      console.log(err.code);
+      res.status(500).json({
+        success: false,
+        message: "COMMUNICATION_ERROR",
+      });
+    });
+};
+
+
 // exports.signout = async (req, res) => {
 //   try {
 //     req.session = null;

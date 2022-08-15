@@ -7,13 +7,10 @@ const { authJwt } = require('../middleware');
 /* GET postulantes listing. */
 router.get('/', postulantesController.getPostulantes);
 router.get('/:email', postulantesController.getPostulante);
-/* REGISTER NEW POSTULANTE */
-/* TO DO: move this route to auth.js */
-router.post('/register', postulantesController.addPostulante);
-/* TO DO: move this route to auth.js */
-router.put('/activate/:id([0-9a-fA-F]{24})?', postulantesController.activatePostulante);
+
 /* UPDATE POSTULANTE */
 router.put('/update', [authJwt.verifyToken], postulantesController.updatePostulante);
+router.put('/update-academic-data', [authJwt.verifyToken], postulantesController.updateAcademicData);
 
 router.use(function(req, res, next) {
     console.log('error 404 por código inválido');

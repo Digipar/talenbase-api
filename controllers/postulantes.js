@@ -3,97 +3,81 @@ const Postulante = require("../models/postulante");
 require("dotenv").config();
 // import { BSONTypeError } from "bson";
 
-exports.addPostulante = (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const nombreCompleto = req.body.nombreCompleto;
-
-  const postulante = new Postulante(
-    email,
-    password,
-    "",
-    nombreCompleto,
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    false,
-    "",
-    "",
-    [],
-    [],
-    [],
-    [],
-    []
-  );
-  postulante
-    .save()
-    .then((result) => {
-      console.log(result);
-      console.log(`http://${process.env.APP_HOST}/validate-email/${result.id}`);
-      res.status(200).json(result);
-    })
-    .catch((err) => {
-      console.log(err.code);
-      res.status(500).json({
-        success: false,
-        message: "COMMUNICATION_ERROR",
-      });
-    });
-};
-
-const update = (id,postulanteData,action,res) => {
+const update = (id, postulanteData, action, res) => {
   Postulante.findById(id)
-    .then((r) => {
-      console.log("encontrado", r);
-      if (r) {
-        r = {...r, ...postulanteData};
-        console.log('r', r)
-        const postulante = new Postulante(r.email,r.password,r.docNro,r.nombreCompleto,r.estadoCivil,r.sexo,r.fechaNacimiento,
-        r.nacionalidad,r.telefono,r.direccion,r.pais,r.departamento,r.ciudad,
-        action=='ACTIVATE' ? true : r.emailActivated,r.sharepointId,r._id.toString(),[],[],[],[],[]);
-        
-        
-        postulante
-          .save()
+    .then((encontrado) => {
+      console.log("encontrado", encontrado);
+      if (encontrado) {
+        encontrado = { ...encontrado, ...postulanteData };
+        switch (action) {
+          case "UPDATE":
+            encontrado = { ...encontrado };
+            break;
+          case "ACTIVATE":
+            encontrado = { ...encontrado, emailValidated: true };
+
+            break;
+          case "ACADEMIC":
+            encontrado = { ...encontrado, postulanteData };
+
+            break;
+
+          default:
+            break;
+        }
+        console.log("encontrado", encontrado);
+
+        const postulante = new Postulante(
+          ...Object.values(encontrado),
+        );
+
+        postulante.save()
           .then((result) => {
-            console.log( `Postulante ${action}D`);
+            console.log(`Postulante ${action}D`);
             res.status(200).json(result);
           })
           .catch((err) => console.log(err));
       } else {
-        console.log('no encontrado')
-        res.status(401).send({success: false, message: 'INVALID_USER'});
+        console.log("no encontrado");
+        res.status(401).send({ success: false, message: "INVALID_USER" });
         // .send({success: false, message: 'No encontrado'});
       }
     })
     .catch((err) => {
       console.log("Ups: ", err);
       // return -1;
-      res.status(404).send({success: false, message: 'No encontrado'});
+      res.status(404).send({ success: false, message: "No encontrado" });
     });
-}
-
-exports.activatePostulante = (req, res, next) => {
-  console.log("Activar postulante req.params.id", req.params.id);
-  let id = ObjectId(req.params.id);
-  update(id,null,'ACTIVATE',res)  
 };
+
+exports.activate = (req, res, next) => {
+  console.log("Activar cuenta req.params.id", req.params.id);
+  let id = ObjectId(req.params.id);
+  update(id, null, "ACTIVATE", res);
+};
+
 exports.updatePostulante = (req, res, next) => {
   console.log("Update postulante req.userId", req.userId);
   console.log("Update postulante body", req.body);
   let id = ObjectId(req.userId);
   let postulanteData = req.body;
-  if(postulanteData){
-    update(id,postulanteData,'UPDATE',res)
-  }else{
+  if (postulanteData) {
+    update(id, postulanteData, "UPDATE", res);
+  } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({success: false, message: 'NO_DATA_RECEIVED'});
+    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+  }
+};
+exports.updateAcademicData = (req, res, next) => {
+  console.log("Update postulante req.userId", req.userId);
+  console.log("Update postulante body", req.body);
+  let id = ObjectId(req.userId);
+  let postulanteData = req.body;
+  if (postulanteData) {
+    update(id, postulanteData, "ACADEMIC", res);
+  } else {
+    // To Do: this case could be validated in the route definition
+    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
   }
 };
 

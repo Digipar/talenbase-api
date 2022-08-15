@@ -3,8 +3,9 @@ const getDB = require('../util/database').getDb;
 const bcrypt = require('bcryptjs');
 
 class Postulante {
-  constructor(email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
-    nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,id,academicData,language,personalReference,experience,department) {
+  constructor(id,email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
+    nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,academicData,language,personalReference,experience,department) {
+    this._id = id ? ObjectId(id) : null;
     this.email = email;
     this.password = password;
     this.docNro = docNro;
@@ -20,7 +21,6 @@ class Postulante {
     this.ciudad = ciudad;
     this.emailValidated = emailValidated;
     this.sharepointId = sharepointId;
-    this._id = id ? ObjectId(id) : null;
     this.academicData = academicData;
     this.language = language;
     this.personalReference = personalReference;
@@ -101,7 +101,7 @@ class Postulante {
         if(postulante)
         {
           console.log('find postulante: ',postulante);
-          const { academicData,language,personalReference,experience,department,sharepointId,emailValidated, ...postulanteNoPass } = postulante;
+          const { password, ...postulanteNoPass } = postulante;
           return postulanteNoPass;
         }else{
           console.log('didnt find postulante');
