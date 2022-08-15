@@ -84,6 +84,18 @@ exports.updateAcademicData = (req, res, next) => {
     res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
   }
 };
+exports.updateLanguageData = (req, res, next) => {
+  console.log("Update postulante req.userId", req.userId);
+  console.log("Update postulante body", req.body);
+  let id = ObjectId(req.userId);
+  let postulanteData = req.body;
+  if (postulanteData) {
+    update(id, postulanteData, "LANGUAGE", res);
+  } else {
+    // To Do: this case could be validated in the route definition
+    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+  }
+};
 
 exports.editProduct = (req, res, next) => {
   const prodId = req.body.productId;
