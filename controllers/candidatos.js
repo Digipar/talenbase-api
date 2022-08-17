@@ -26,6 +26,9 @@ const update = (id, candidatoData, action, res) => {
           case "LANGUAGE":
             encontrado = { ...encontrado, candidatoData };
 
+          case "PREVIOUS_EXPERIENCE":
+            encontrado = { ...encontrado, candidatoData };
+
             break;
 
           default:
@@ -98,6 +101,19 @@ exports.updateLanguageData = (req, res, next) => {
     res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
   }
 };
+
+exports.updatePreviousExperience = (req, res, next) => {
+  console.log("create previous experience req.userId", req.userId);
+  console.log("create previous experience body", req.body);
+  let id = (DBSYSTEM === 'COSMODB' ? req.userId: ObjectId(req.userId));
+  let candidatoData = req.body;
+  if (candidatoData) {
+    update(id, candidatoData, "PREVIOUS_EXPERIENCE", res);
+  } else {
+    // To Do: this case could be validated in the route definition
+    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+  }
+}
 
 exports.editProduct = (req, res, next) => {
   const prodId = req.body.productId;
