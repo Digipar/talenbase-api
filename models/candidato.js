@@ -2,7 +2,7 @@ const ObjectId = require('mongodb').ObjectId;
 const getDB = require('../util/database').getDb;
 const bcrypt = require('bcryptjs');
 
-class Postulante {
+class Candidato {
   constructor(id,email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
     nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,academicData,language,personalReference,experience,department) {
     this._id = id ? ObjectId(id) : null;
@@ -36,16 +36,16 @@ class Postulante {
     console.log('this._id antes de entrar', this._id)
     if(this._id){
       message = `TALENT_UPDATED_SUCCESSFULLY`;
-      // Update the Postulante
-      dbOp = db.collection('postulantes')
+      // Update the Candidato
+      dbOp = db.collection('candidatos')
         .updateOne({_id: this._id}, {$set: this});
 
     }else{
       // hash the password
       message = `TALENT_CREATED_SUCCESSFULLY`;
       this.password = bcrypt.hashSync(this.password, 10);
-      // Insert the Postulante
-      dbOp = db.collection('postulantes')
+      // Insert the Candidato
+      dbOp = db.collection('candidatos')
         .insertOne(this);
     }
     return dbOp
@@ -64,12 +64,12 @@ class Postulante {
 
   static fetchAll() {
     const db=getDB();
-    return db.collection('postulantes')
+    return db.collection('candidatos')
       .find()
       .toArray()
-      .then(postulantes => {
-        console.log(postulantes);
-        return postulantes;
+      .then(candidatos => {
+        console.log(candidatos);
+        return candidatos;
       })
       .catch(err => {
         console.log(err);
@@ -144,4 +144,4 @@ class Postulante {
 
 }
 
-module.exports = Postulante;
+module.exports = Candidato;

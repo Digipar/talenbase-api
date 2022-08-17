@@ -6,7 +6,7 @@ var logger = require('morgan');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-const postulantesRouter = require("./routes/postulantes");
+const candidatosRouter = require("./routes/candidatos");
 const authRouter = require("./routes/auth");
 
 var app = express();
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', () => {
 //   res.render('index', { title: 'Welcome to the talenbase API' });
 // });
-app.use("/postulantes", postulantesRouter);
+app.use("/candidatos", candidatosRouter);
 app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler

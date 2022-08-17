@@ -1,10 +1,10 @@
 const ObjectId = require("mongodb").ObjectID;
-const Postulante = require("../models/postulante");
+const Candidato = require("../models/candidato");
 require("dotenv").config();
 // import { BSONTypeError } from "bson";
 
 const update = (id, postulanteData, action, res) => {
-  Postulante.findById(id)
+  Candidato.findById(id)
     .then((encontrado) => {
       console.log("encontrado", encontrado);
       if (encontrado) {
@@ -31,13 +31,13 @@ const update = (id, postulanteData, action, res) => {
         }
         console.log("encontrado", encontrado);
 
-        const postulante = new Postulante(
+        const postulante = new Candidato(
           ...Object.values(encontrado),
         );
 
         postulante.save()
           .then((result) => {
-            console.log(`Postulante ${action}D`);
+            console.log(`Candidato ${action}D`);
             res.status(200).json(result);
           })
           .catch((err) => console.log(err));
@@ -60,7 +60,7 @@ exports.activate = (req, res, next) => {
   update(id, null, "ACTIVATE", res);
 };
 
-exports.updatePostulante = (req, res, next) => {
+exports.updateCandidato = (req, res, next) => {
   console.log("Update postulante req.userId", req.userId);
   console.log("Update postulante body", req.body);
   let id = ObjectId(req.userId);
@@ -121,16 +121,16 @@ exports.editProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-exports.getPostulantes = (req, res, next) => {
-  Postulante.fetchAll()
+exports.getCandidatos = (req, res, next) => {
+  Candidato.fetchAll()
     .then((postulante) => {
       res.status(200).json(postulante);
     })
     .catch((err) => console.log(err));
 };
 
-exports.getPostulante = (req, res, next) => {
-  Postulante.findByEmail(req.params.email)
+exports.getCandidato = (req, res, next) => {
+  Candidato.findByEmail(req.params.email)
     .then((postulante) => {
       res.status(200).json(postulante);
     })
