@@ -1,7 +1,7 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
-// const Postulante = require("../models/").Postulante;
+// const Candidato = require("../models/").Candidato;
 // const User = db.user;
 verifyToken = (req, res, next) => {
   console.log('verifyToken...')

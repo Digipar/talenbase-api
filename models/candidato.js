@@ -1,11 +1,13 @@
 const ObjectId = require('mongodb').ObjectId; 
 const getDB = require('../util/database').getDb;
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 class Candidato {
   constructor(id,email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
     nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,academicData,language,personalReference,experience,department) {
-    this._id = id ? ObjectId(id) : null;
+    this._id = id ?  (DBSYSTEM === 'COSMODB' ? id : ObjectId(id)) : null;
     this.email = email;
     this.password = password;
     this.docNro = docNro;
@@ -52,7 +54,7 @@ class Candidato {
       .then(result => {
         console.log(result);
         console.log('this._id ya en el result', this._id.toString())
-        // To Do: is necessary to return the id of the postulante? maybe for the activate, but not for the update
+        // To Do: is necessary to return the id of the candidato? maybe for the activate, but not for the update
         return {success: true, message: message, id: this._id.toString()};
       })
       .catch(err => {
@@ -79,12 +81,12 @@ class Candidato {
   static findById(id) {
     console.log('go to find:', id)
     const db=getDB();
-    return db.collection('postulantes')
+    return db.collection('candidatos')
       .find({_id: id})
       .next()
-      .then(postulante => {
-        console.log('find postulante: ',postulante);
-        return postulante;
+      .then(candidato => {
+        console.log('find candidato: ',candidato);
+        return candidato;
       })
       .catch(err => {
         console.log(err);
@@ -94,18 +96,18 @@ class Candidato {
   static findByEmail(email) {
     console.log('go to find:', email)
     const db=getDB();
-    return db.collection('postulantes')
+    return db.collection('candidatos')
       .find({email: email})
       .next()
-      .then(postulante => {
-        if(postulante)
+      .then(candidato => {
+        if(candidato)
         {
-          console.log('find postulante: ',postulante);
-          const { password, ...postulanteNoPass } = postulante;
-          return postulanteNoPass;
+          console.log('find candidato: ',candidato);
+          const { password, ...candidatoNoPass } = candidato;
+          return candidatoNoPass;
         }else{
-          console.log('didnt find postulante');
-          return postulante;
+          console.log('didnt find candidato');
+          return candidato;
         }
       })
       .catch(err => {
@@ -117,12 +119,12 @@ class Candidato {
   static find(filter) {
     console.log('go to find:', filter)
     const db=getDB();
-    return db.collection('postulantes')
+    return db.collection('candidatos')
       .find(filter)
       .next()
-      .then(postulante => {
-        console.log('find postulante: ',postulante);
-        return postulante;
+      .then(candidato => {
+        console.log('find candidato: ',candidato);
+        return candidato;
       })
       .catch(err => {
         console.log(err);
@@ -132,8 +134,8 @@ class Candidato {
 
   static deleteById(id) {
     const db=getDB();
-    return db.collection('postulantes')
-      .deleteOne({_id: ObjectId(id)})
+    return db.collection('candidatos')
+      .deleteOne({_id: DBSYSTEM === 'COSMODB' ? id: ObjectId(id)})
       .then(result => {
         console.log(result);
       })
