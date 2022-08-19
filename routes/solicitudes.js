@@ -6,7 +6,7 @@ const { authJwt } = require('../middleware');
 /* To Do: validate JWT token */
 /* GET solicitudes listing. */
 router.get('/', solicitudesController.getSolicitudes);
-router.get('/:slug', solicitudesController.getSolicitud);
+router.get('/:id', solicitudesController.getSolicitud);
 
 /* UPDATE CANDIDATO 
 router.put('/update', [authJwt.verifyToken], solicitudesController.updateCandidato);
