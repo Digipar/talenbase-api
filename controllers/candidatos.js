@@ -30,6 +30,10 @@ const update = (id, candidatoData, action, res) => {
             encontrado = { ...encontrado, candidatoData };
 
             break;
+          case "CHILD_DATA":
+            encontrado = { ...encontrado, candidatoData };
+
+            break;
 
           default:
             break;
@@ -109,6 +113,18 @@ exports.updatePreviousExperience = (req, res, next) => {
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "PREVIOUS_EXPERIENCE", res);
+  } else {
+    // To Do: this case could be validated in the route definition
+    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+  }
+}
+exports.updateChildData = (req, res, next) => {
+  console.log("create CHILD DATA req.userId", req.userId);
+  console.log("create CHILD DATA body", req.body);
+  let id = (DBSYSTEM === 'COSMODB' ? req.userId: ObjectId(req.userId));
+  let candidatoData = req.body;
+  if (candidatoData) {
+    update(id, candidatoData, "CHILD_DATA", res);
   } else {
     // To Do: this case could be validated in the route definition
     res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
