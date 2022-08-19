@@ -34,11 +34,11 @@ class Solicitud {
         return -1
       });
   }
-  static findByEmail(email) {
-    console.log('go to find:', email)
+  static findBySpId(spId) {
+    console.log('go to find:', spId)
     const db=getDB();
     return db.collection('solicitudes')
-      .find({email: email})
+      .find({sharepointId: spId})
       .next()
       .then(solicitud => {
         return solicitud;

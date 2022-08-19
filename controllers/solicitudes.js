@@ -15,7 +15,7 @@ exports.getSolicitudes = (req, res, next) => {
 };
 
 exports.getSolicitud = (req, res, next) => {
-  Solicitud.findByEmail(req.params.email)
+  Solicitud.findBySpId(req.params.spId)
     .then((solicitud) => {
       res.status(200).json(solicitud);
     })
