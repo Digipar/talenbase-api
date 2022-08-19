@@ -38,9 +38,10 @@ class Solicitud {
     console.log('go to find:', spId)
     const db=getDB();
     return db.collection('solicitudes')
-      .find({sharepointId: spId})
+      .find({sharepointId: Number(spId)})
       .next()
       .then(solicitud => {
+        console.log('solicitud found', solicitud)
         return solicitud;
       })
       .catch(err => {
