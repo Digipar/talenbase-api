@@ -14,6 +14,7 @@ router.put('/update-academic-data', [authJwt.verifyToken], candidatosController.
 router.put('/update-language-data', [authJwt.verifyToken], candidatosController.updateLanguageData);
 router.put('/update-previous-experience', [authJwt.verifyToken], candidatosController.updatePreviousExperience);
 router.put('/update-personal-reference', [authJwt.verifyToken], candidatosController.updateChildData);
+router.put('/update-child-data', [authJwt.verifyToken], candidatosController.updateChildData);
 // router.delete('/delete-previous-experience', [authJwt.verifyToken], candidatosController.deletePreviousExperience);
 
 router.use(function(req, res, next) {
