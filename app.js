@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 
 const solicitudesRouter = require("./routes/solicitudes");
 const candidatosRouter = require("./routes/candidatos");
+const departamentosRouter = require("./routes/departamentos");
 const authRouter = require("./routes/auth");
 
 var app = express();
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // });
 app.use("/solicitudes", solicitudesRouter);
 app.use("/candidatos", candidatosRouter);
+app.use("/departamentos", departamentosRouter);
 app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler

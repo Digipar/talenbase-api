@@ -4,15 +4,15 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
-class Solicitud {
+class Departamento {
   static fetchAll() {
     const db=getDB();
-    return db.collection('solicitudes')
+    return db.collection('departamentos')
       .find()
       .toArray()
-      .then(solicitudes => {
-        console.log(solicitudes);
-        return solicitudes;
+      .then(departamentos => {
+        console.log(departamentos);
+        return departamentos;
       })
       .catch(err => {
         console.log(err);
@@ -22,12 +22,12 @@ class Solicitud {
   static findById(id) {
     console.log('go to find:', id)
     const db=getDB();
-    return db.collection('solicitudes')
+    return db.collection('departamentos')
       .find({_id: id})
       .next()
-      .then(solicitud => {
-        console.log('find solicitud: ',solicitud);
-        return solicitud;
+      .then(departamento => {
+        console.log('find departamento: ',departamento);
+        return departamento;
       })
       .catch(err => {
         console.log(err);
@@ -37,11 +37,11 @@ class Solicitud {
   static findByEmail(email) {
     console.log('go to find:', email)
     const db=getDB();
-    return db.collection('solicitudes')
+    return db.collection('departamentos')
       .find({email: email})
       .next()
-      .then(solicitud => {
-        return solicitud;
+      .then(departamento => {
+        return departamento;
       })
       .catch(err => {
         console.log(err);
@@ -52,12 +52,12 @@ class Solicitud {
   static find(filter) {
     console.log('go to find:', filter)
     const db=getDB();
-    return db.collection('solicitudes')
+    return db.collection('departamentos')
       .find(filter)
       .next()
-      .then(solicitud => {
-        console.log('find solicitud: ',solicitud);
-        return solicitud;
+      .then(departamento => {
+        console.log('find departamento: ',departamento);
+        return departamento;
       })
       .catch(err => {
         console.log(err);
@@ -69,4 +69,4 @@ class Solicitud {
 
 }
 
-module.exports = Solicitud;
+module.exports = Departamento;
