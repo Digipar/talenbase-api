@@ -8,10 +8,12 @@ const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 exports.registerPostulacion = (req, res, next) => {
   const solicitudId = req.body.solicitudId;
+  const candidatoId = req.userId;
 
   const postulacion = new Postulacion(
-    null, solicitudId
+    solicitudId, candidatoId
   );
+  console.log('postulacion', postulacion)
   postulacion.save()
     .then((result) => {
       console.log(result)

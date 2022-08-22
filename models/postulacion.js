@@ -4,8 +4,10 @@ require('dotenv').config();
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 class Postulacion {
-    constructor(solicitudId) {
+    constructor(solicitudId, candidatoId) {
         this.solicitudId = solicitudId;
+        this.candidatoId = candidatoId;
+        this.sharepointId = '';
     }
 
     save() {
