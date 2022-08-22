@@ -4,11 +4,8 @@ require('dotenv').config();
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 class Postulacion {
-    constructor(id, solicitudId, candidatoId, sharepointId) {
-        this._id = id ? (DBSYSTEM === 'COSMODB' ? id : ObjectId(id)) : null;
+    constructor(solicitudId) {
         this.solicitudId = solicitudId;
-        this.candidatoId = candidatoId;
-        this.sharepointId = sharepointId;
     }
 
     save() {
