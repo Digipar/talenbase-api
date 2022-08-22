@@ -6,6 +6,7 @@ var logger = require('morgan');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+const postulacionesRouter = require("./routes/postulaciones");
 const solicitudesRouter = require("./routes/solicitudes");
 const candidatosRouter = require("./routes/candidatos");
 const departamentosRouter = require("./routes/departamentos");
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', () => {
 //   res.render('index', { title: 'Welcome to the talenbase API' });
 // });
+app.use("/postulaciones", postulacionesRouter);
 app.use("/solicitudes", solicitudesRouter);
 app.use("/candidatos", candidatosRouter);
 app.use("/departamentos", departamentosRouter);
