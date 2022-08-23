@@ -7,9 +7,10 @@ const { authJwt } = require('../middleware');
 
 router.post('/registrar-postulacion', [authJwt.verifyToken], postulacionesController.registerPostulacion);
 router.post('/filtrar-postulacion', postulacionesController.findByFilterPostulacion);
+router.post('/find-by-candidato-postulacion', [authJwt.verifyToken], postulacionesController.findByCandidatoIdPostulacion);
 
-router.use(function(req, res, next) {
-    console.log('error 404 por código inválido');
-    res.status(404).send({success: false, message: 'CODE_INVALID'});
-  });
+router.use(function (req, res, next) {
+  console.log('error 404 por código inválido');
+  res.status(404).send({ success: false, message: 'CODE_INVALID' });
+});
 module.exports = router;

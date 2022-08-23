@@ -32,19 +32,33 @@ class Postulacion {
             });
     };
 
-    static findByFilter(filter) {
-        const db=getDB();
+    static findByCandidatoId(id) {
+        const db = getDB();
         return db.collection('postulacion')
-          .find(filter)
-          .toArray()
-          .then(postulaciones => {
-            // console.log(postulaciones);
-            return postulaciones;
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
+            .find({ candidatoId: id })
+            .toArray()
+            .then(postulaciones => {
+                // console.log(postulaciones);
+                return postulaciones;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    static findByFilter(filter) {
+        const db = getDB();
+        return db.collection('postulacion')
+            .find(filter)
+            .toArray()
+            .then(postulaciones => {
+                // console.log(postulaciones);
+                return postulaciones;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
 
 }
 

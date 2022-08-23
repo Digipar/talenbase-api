@@ -31,7 +31,7 @@ exports.registerPostulacion = (req, res, next) => {
 exports.findByFilterPostulacion = (req, res, next) => {
   Postulacion.findByFilter(req.body)
     .then((result) => {
-      console.log(result)
+      // console.log(result)
       res.status(200).json(result);
     }).catch((err) => {
       console.log(err.code);
@@ -42,3 +42,18 @@ exports.findByFilterPostulacion = (req, res, next) => {
     });
 };
 
+exports.findByCandidatoIdPostulacion = (req, res, next) => {
+  const candidatoId = req.userId;
+  console.log('candidatoId', candidatoId)
+  Postulacion.findByCandidatoId(candidatoId)
+    .then((result) => {
+      // console.log(result)
+      res.status(200).json(result);
+    }).catch((err) => {
+      console.log(err.code);
+      res.status(500).json({
+        success: false,
+        message: "COMMUNICATION_ERROR",
+      });
+    });
+};
