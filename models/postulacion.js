@@ -30,7 +30,21 @@ class Postulacion {
                 const message = err.code === 11000 ? 'EMAIL_DUPLICATED' : 'UNKNOW_ERROR_SAVING_TALENT';
                 return { success: false, message };
             });
-    }
+    };
+
+    static findByFilter(filter) {
+        const db=getDB();
+        return db.collection('postulacion')
+          .find(filter)
+          .toArray()
+          .then(postulaciones => {
+            // console.log(postulaciones);
+            return postulaciones;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
 
 }
 

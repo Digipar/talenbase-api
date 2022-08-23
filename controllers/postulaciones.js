@@ -28,3 +28,17 @@ exports.registerPostulacion = (req, res, next) => {
     });
 };
 
+exports.findByFilterPostulacion = (req, res, next) => {
+  Postulacion.findByFilter(req.body)
+    .then((result) => {
+      console.log(result)
+      res.status(200).json(result);
+    }).catch((err) => {
+      console.log(err.code);
+      res.status(500).json({
+        success: false,
+        message: "COMMUNICATION_ERROR",
+      });
+    });
+};
+

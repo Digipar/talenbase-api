@@ -6,6 +6,7 @@ const { authJwt } = require('../middleware');
 /* To Do: validate JWT token */
 
 router.post('/registrar-postulacion', [authJwt.verifyToken], postulacionesController.registerPostulacion);
+router.post('/filtrar-postulacion', postulacionesController.findByFilterPostulacion);
 
 router.use(function(req, res, next) {
     console.log('error 404 por código inválido');
