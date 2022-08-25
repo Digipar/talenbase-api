@@ -3,18 +3,19 @@ const MongoClient = mongodb.MongoClient;
 require('dotenv').config();
 
 let _db;
+const connectTo = process.env.MONGO_SERVER_PART1 + process.env.DB + process.env.MONGO_SERVER_PART2
 
 const mongoConnect = callback => {
-  MongoClient.connect(process.env.MONGO_SERVER)
-  .then(client => {
-    console.log('Connected to MongoDB');
-    _db = client.db();
-    callback();
-  
-  }).catch (err => {
-    console.log('Error connecting to: '+process.env.MONGO_SERVER, err)
-    // throw err;
-  })
+  MongoClient.connect(connectTo)
+    .then(client => {
+      console.log('Connected to MongoDB');
+      _db = client.db();
+      callback();
+
+    }).catch(err => {
+      console.log('Error connecting to: ' + connectTo, err)
+      // throw err;
+    })
 
 }
 
