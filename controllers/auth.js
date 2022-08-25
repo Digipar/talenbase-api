@@ -2,6 +2,7 @@ require('dotenv').config();
 const TOKEN_SECRET = process.env.TOKEN_SECRET || null;
 
 const User = require("../models/candidato");
+const Mailer = require("../models/mailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -25,7 +26,7 @@ exports.login = async (req, res) => {
         message: "INVALID_PASSWORD",
       });
     }
-    
+
     if (!user.emailValidated) {
       return res.status(401).send({
         message: "EMAIL_NOT_VALIDATED",
@@ -36,7 +37,7 @@ exports.login = async (req, res) => {
       expiresIn: 86400, // 24 hours
     });
     // req.session.token = token;
-    
+
     return res.status(200).send({
       // id: user._id,
       username: user.email,
@@ -55,19 +56,33 @@ exports.register = (req, res, next) => {
   const nombreCompleto = req.body.nombreCompleto;
 
   const user = new User(
-    null,email,password,"",nombreCompleto,
-    "","","","","","",
-    "",    "",    "",    false,
-    "",  [],    [],    [],    [],  []
+    null, email, password, "", nombreCompleto,
+    "", "", "", "", "", "",
+    "", "", "", false,
+    "", [], [], [], [], []
   );
   user.save()
     .then((result) => {
-      console.log(result);
+      console.log('result candidato',result);
       console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
-      res.status(200).json(result);
+     
+      const mailer = new Mailer(
+        'ACTIVACION', email, result.id, process.env.APP_HOST
+      );
+      mailer.save()
+        .then((result2) => {
+          res.status(200).json(result);
+        }).catch((err) => {
+          console.log('error mailer',err.code);
+          res.status(500).json({
+            success: false,
+            message: "COMMUNICATION_ERROR",
+          });
+        });
+
     })
     .catch((err) => {
-      console.log(err.code);
+      console.log('err',err);
       res.status(500).json({
         success: false,
         message: "COMMUNICATION_ERROR",
