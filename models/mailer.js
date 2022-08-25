@@ -2,10 +2,10 @@ const ObjectId = require('mongodb').ObjectId;
 const getDB = require('../util/database').getDb;
 require('dotenv').config();
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
-
+const moment = require('moment');
 class Mailer {
     constructor(tipo, direccion, candidatoId, host) {
-        this.fechaHora = 'dd/mm/yyyy';
+        this.fechaHora = moment().format('YYYY-MM-DD HH:mm:ss');
         this.tipo = tipo;
         this.encabezado = 'Talenbase';
         this.cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` +`http://${host}/activate-account/${candidatoId}`+ `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
