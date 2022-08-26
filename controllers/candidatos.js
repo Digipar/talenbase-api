@@ -13,25 +13,25 @@ const update = (id, candidatoData, action, res) => {
         encontrado = { ...encontrado, ...candidatoData };
         switch (action) {
           case "UPDATE":
-            encontrado = { ...encontrado };
+            encontrado = { ...encontrado, actualizar: true };
             break;
           case "ACTIVATE":
             encontrado = { ...encontrado, emailValidated: true };
 
             break;
           case "ACADEMIC":
-            encontrado = { ...encontrado, candidatoData };
+            encontrado = { ...encontrado, candidatoData, actualizar: true };
 
             break;
           case "LANGUAGE":
-            encontrado = { ...encontrado, candidatoData };
+            encontrado = { ...encontrado, candidatoData, actualizar: true };
 
           case "PREVIOUS_EXPERIENCE":
-            encontrado = { ...encontrado, candidatoData };
+            encontrado = { ...encontrado, candidatoData, actualizar: true };
 
             break;
           case "CHILD_DATA":
-            encontrado = { ...encontrado, candidatoData };
+            encontrado = { ...encontrado, candidatoData, actualizar: true };
 
             break;
 
@@ -130,30 +130,6 @@ exports.updateChildData = (req, res, next) => {
     res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
   }
 }
-
-exports.editProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
-  const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
-
-  const product = new Product(
-    updatedTitle,
-    updatedImageUrl,
-    updatedPrice,
-    updatedDesc,
-    new ObjectId(prodId)
-  );
-  product
-    .save()
-    .then((productData) => {})
-    .then((result) => {
-      console.log("UPDATED PRODUCT!");
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
-};
 
 exports.getCandidatos = (req, res, next) => {
   Candidato.fetchAll()
