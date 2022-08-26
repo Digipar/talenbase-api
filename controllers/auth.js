@@ -63,26 +63,30 @@ exports.register = (req, res, next) => {
   );
   user.save()
     .then((result) => {
-      console.log('result candidato',result);
+      console.log('result candidato', result);
       console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
-     
+
       const mailer = new Mailer(
         'ACTIVACION', email, result.id, process.env.APP_HOST
       );
-      mailer.save()
-        .then((result2) => {
-          res.status(200).json(result);
-        }).catch((err) => {
-          console.log('error mailer',err.code);
-          res.status(500).json({
-            success: false,
-            message: "COMMUNICATION_ERROR",
+      if (result.success) {
+        mailer.save()
+          .then((result2) => {
+            res.status(200).json(result);
+          }).catch((err) => {
+            console.log('error mailer', err);
+            res.status(500).json({
+              success: false,
+              message: "COMMUNICATION_ERROR",
+            });
           });
-        });
+      }else{
+        res.status(500).json(result);
+      }
 
     })
     .catch((err) => {
-      console.log('err',err);
+      console.log('err', err);
       res.status(500).json({
         success: false,
         message: "COMMUNICATION_ERROR",
