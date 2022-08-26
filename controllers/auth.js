@@ -59,7 +59,7 @@ exports.register = (req, res, next) => {
     null, email, password, "", nombreCompleto,
     "", "", "", "", "", "",
     "", "", "", false,
-    "", [], [], [], [], []
+    "", [], [], [], [], [],false
   );
   user.save()
     .then((result) => {

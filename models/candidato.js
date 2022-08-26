@@ -6,7 +6,7 @@ const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 class Candidato {
   constructor(id,email, password, docNro, nombreCompleto, estadoCivil, sexo, fechaNacimiento, 
-    nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,academicData,language,personalReference,experience,department) {
+    nacionalidad,telefono,direccion,pais,departamento,ciudad, emailValidated,sharepointId,academicData,language,personalReference,experience,department,actualizar) {
     this._id = id ?  (DBSYSTEM === 'COSMODB' ? id : ObjectId(id)) : null;
     this.email = email;
     this.password = password;
@@ -28,7 +28,7 @@ class Candidato {
     this.personalReference = personalReference;
     this.experience = experience;
     this.department = department;
-    
+    this.actualizar = actualizar;
   }
 
   save() {
