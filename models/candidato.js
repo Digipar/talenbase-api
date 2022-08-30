@@ -37,14 +37,14 @@ class Candidato {
     let message;
     console.log('this._id antes de entrar', this._id)
     if(this._id){
-      message = `TALENT_UPDATED_SUCCESSFULLY`;
+      message = `Registro actualizado exitosamente`;
       // Update the Candidato
       dbOp = db.collection('candidatos')
         .updateOne({_id: this._id}, {$set: this});
 
     }else{
       // hash the password
-      message = `TALENT_CREATED_SUCCESSFULLY`;
+      message = `Registro creado exitosamente`;
       this.password = bcrypt.hashSync(this.password, 10);
       // Insert the Candidato
       dbOp = db.collection('candidatos')
@@ -59,7 +59,7 @@ class Candidato {
       })
       .catch(err => {
         console.log('err', err)
-        const message = err.code === 11000 ? 'EMAIL_DUPLICATED' : 'UNKNOW_ERROR_SAVING_TALENT'; 
+        const message = err.code === 11000 ? 'Email duplicado' : 'Error al grabar'; 
         return {success: false, message};
       });
   }
