@@ -52,7 +52,7 @@ const update = (id, candidatoData, action, res) => {
           .catch((err) => console.log(err));
       } else {
         console.log("no encontrado");
-        res.status(401).send({ success: false, message: "INVALID_USER" });
+        res.status(401).send({ success: false, message: "Usuario inválido" });
         // .send({success: false, message: 'No encontrado'});
       }
     })
@@ -78,7 +78,7 @@ exports.updateCandidato = (req, res, next) => {
     update(id, candidatoData, "UPDATE", res);
   } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
   }
 };
 exports.updateAcademicData = (req, res, next) => {
@@ -90,7 +90,7 @@ exports.updateAcademicData = (req, res, next) => {
     update(id, candidatoData, "ACADEMIC", res);
   } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
   }
 };
 exports.updateLanguageData = (req, res, next) => {
@@ -102,7 +102,7 @@ exports.updateLanguageData = (req, res, next) => {
     update(id, candidatoData, "LANGUAGE", res);
   } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
   }
 };
 
@@ -115,7 +115,7 @@ exports.updatePreviousExperience = (req, res, next) => {
     update(id, candidatoData, "PREVIOUS_EXPERIENCE", res);
   } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
   }
 }
 exports.updateChildData = (req, res, next) => {
@@ -127,7 +127,7 @@ exports.updateChildData = (req, res, next) => {
     update(id, candidatoData, "CHILD_DATA", res);
   } else {
     // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "NO_DATA_RECEIVED" });
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
   }
 }
 

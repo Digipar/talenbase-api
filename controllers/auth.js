@@ -13,7 +13,7 @@ exports.login = async (req, res) => {
     });
     // const user = null;
     if (!user) {
-      return res.status(404).send({ message: "EMAIL_UNKNOW" });
+      return res.status(404).send({ message: "Email desconocido" });
     }
     // const passwordIsValid = false;
 
@@ -23,13 +23,13 @@ exports.login = async (req, res) => {
     );
     if (!passwordIsValid) {
       return res.status(401).send({
-        message: "INVALID_PASSWORD",
+        message: "Contraseña inválida",
       });
     }
 
     if (!user.emailValidated) {
       return res.status(401).send({
-        message: "EMAIL_NOT_VALIDATED",
+        message: "Email no validado",
       });
     }
     console.log('user to sign', user)
@@ -77,7 +77,7 @@ exports.register = (req, res, next) => {
             console.log('error mailer', err);
             res.status(500).json({
               success: false,
-              message: "COMMUNICATION_ERROR",
+              message: "Error de comunicación",
             });
           });
       }else{
@@ -89,7 +89,7 @@ exports.register = (req, res, next) => {
       console.log('err', err);
       res.status(500).json({
         success: false,
-        message: "COMMUNICATION_ERROR",
+        message: "Error de comunicación",
       });
     });
 };

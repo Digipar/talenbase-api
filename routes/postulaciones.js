@@ -11,6 +11,6 @@ router.post('/find-by-candidato-postulacion', [authJwt.verifyToken], postulacion
 
 router.use(function (req, res, next) {
   console.log('error 404 por código inválido');
-  res.status(404).send({ success: false, message: 'CODE_INVALID' });
+  res.status(404).send({ success: false, message: 'Código inválido' });
 });
 module.exports = router;
