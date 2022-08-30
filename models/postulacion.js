@@ -27,7 +27,7 @@ class Postulacion {
             })
             .catch(err => {
                 console.log('err', err)
-                const message = err.code === 11000 ? 'EMAIL_DUPLICATED' : 'UNKNOW_ERROR_SAVING_TALENT';
+                const message = err.code === 11000 ? 'Email duplicado' : 'Error al grabar';
                 return { success: false, message };
             });
     };

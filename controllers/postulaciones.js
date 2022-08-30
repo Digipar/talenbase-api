@@ -23,7 +23,7 @@ exports.registerPostulacion = (req, res, next) => {
       console.log(err.code);
       res.status(500).json({
         success: false,
-        message: "COMMUNICATION_ERROR",
+        message: "Error de comunicación",
       });
     });
 };
@@ -37,7 +37,7 @@ exports.findByFilterPostulacion = (req, res, next) => {
       console.log(err.code);
       res.status(500).json({
         success: false,
-        message: "COMMUNICATION_ERROR",
+        message: "Error de comunicación",
       });
     });
 };
@@ -53,7 +53,7 @@ exports.findByCandidatoIdPostulacion = (req, res, next) => {
       console.log(err.code);
       res.status(500).json({
         success: false,
-        message: "COMMUNICATION_ERROR",
+        message: "Error de comunicación",
       });
     });
 };

@@ -32,7 +32,7 @@ class Mailer {
             })
             .catch(err => {
                 console.log('err', err)
-                const message = err.code === 11000 ? 'EMAIL_DUPLICATED' : 'UNKNOW_ERROR_SAVING_IN_MAILER';
+                const message = err.code === 11000 ? 'Email duplicado' : 'Error desconocido al grabar en mailer';
                 return { success: false, message };
             });
     };
