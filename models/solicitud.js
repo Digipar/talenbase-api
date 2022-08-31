@@ -66,6 +66,20 @@ class Solicitud {
       });
   }
 
+  static findByFilter(filter) {
+    console.log('filter', filter)
+    const db = getDB();
+    return db.collection('solicitudes')
+        .find(filter)
+        .toArray()
+        .then(solicitud => {
+            console.log(solicitud);
+            return solicitud;
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
   
 
 }

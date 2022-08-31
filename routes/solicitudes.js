@@ -7,6 +7,7 @@ const { authJwt } = require('../middleware');
 /* GET solicitudes listing. */
 router.get('/', solicitudesController.getSolicitudes);
 router.get('/:spId', solicitudesController.getSolicitud);
+router.post('/filtrar-solicitud-abierta', solicitudesController.findSolicitudAbierta);
 
 /* UPDATE CANDIDATO 
 router.put('/update', [authJwt.verifyToken], solicitudesController.updateCandidato);
