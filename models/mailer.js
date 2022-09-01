@@ -4,18 +4,17 @@ require('dotenv').config();
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 const moment = require('moment');
 class Mailer {
-    constructor(tipo, direccion, candidatoId, host) {
+    constructor(tipo, direccion, candidatoId, cuerpo) {
         this.fechaHora = moment().format('YYYY-MM-DD HH:mm:ss');
         this.tipo = tipo;
-        this.encabezado = 'Talenbase';
-        this.cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` +`http://${host}/activate-account/${candidatoId}`+ `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
+        this.encabezado = tipo == 'ACTIVACION' ? 'Activación de cuenta - Talenbase' : 'Recueración de cuenta - Talenbase';
+        this.cuerpo = cuerpo;
         this.direccion = direccion;
         this.estado = 2;
         this.candidatoId = candidatoId;
     }
     
     save() {
-        console.log('first', this.candidatoId)
         const db = getDB();
         let dbOp;
         let message;

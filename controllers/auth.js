@@ -59,15 +59,15 @@ exports.register = (req, res, next) => {
     null, email, password, "", nombreCompleto,
     "", "", "", "", "", "",
     "", "", "", false,
-    "", [], [], [], [], [],false
+    "", [], [], [], [], [], false
   );
   user.save()
     .then((result) => {
       console.log('result candidato', result);
       console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
-
+      const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${result.id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
       const mailer = new Mailer(
-        'ACTIVACION', email, result.id, process.env.APP_HOST
+        'ACTIVACION', email, result.id, cuerpo
       );
       if (result.success) {
         mailer.save()
@@ -80,7 +80,7 @@ exports.register = (req, res, next) => {
               message: "Error de comunicación",
             });
           });
-      }else{
+      } else {
         res.status(500).json(result);
       }
 

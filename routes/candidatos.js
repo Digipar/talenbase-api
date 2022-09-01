@@ -9,6 +9,7 @@ router.get('/', candidatosController.getCandidatos);
 router.get('/:email', candidatosController.getCandidato);
 
 /* UPDATE CANDIDATO */
+router.post('/update-password', candidatosController.updateCandidatoPassword);
 router.put('/update', [authJwt.verifyToken], candidatosController.updateCandidato);
 router.put('/update-academic-data', [authJwt.verifyToken], candidatosController.updateAcademicData);
 router.put('/update-language-data', [authJwt.verifyToken], candidatosController.updateLanguageData);

@@ -2,6 +2,7 @@ const ObjectId = require("mongodb").ObjectID;
 const Candidato = require("../models/candidato");
 require("dotenv").config();
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 
@@ -72,7 +73,7 @@ exports.activate = (req, res, next) => {
 exports.updateCandidato = (req, res, next) => {
   console.log("Update candidato req.userId", req.userId);
   console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ?req.userId: ObjectId(req.userId);
+  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "UPDATE", res);
@@ -84,7 +85,7 @@ exports.updateCandidato = (req, res, next) => {
 exports.updateAcademicData = (req, res, next) => {
   console.log("Update candidato req.userId", req.userId);
   console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ?req.userId: ObjectId(req.userId);
+  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "ACADEMIC", res);
@@ -96,7 +97,7 @@ exports.updateAcademicData = (req, res, next) => {
 exports.updateLanguageData = (req, res, next) => {
   console.log("Update candidato req.userId", req.userId);
   console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ?req.userId: ObjectId(req.userId);
+  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "LANGUAGE", res);
@@ -109,7 +110,7 @@ exports.updateLanguageData = (req, res, next) => {
 exports.updatePreviousExperience = (req, res, next) => {
   console.log("create previous experience req.userId", req.userId);
   console.log("create previous experience body", req.body);
-  let id = (DBSYSTEM === 'COSMODB' ? req.userId: ObjectId(req.userId));
+  let id = (DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId));
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "PREVIOUS_EXPERIENCE", res);
@@ -121,7 +122,7 @@ exports.updatePreviousExperience = (req, res, next) => {
 exports.updateChildData = (req, res, next) => {
   console.log("create CHILD DATA req.userId", req.userId);
   console.log("create CHILD DATA body", req.body);
-  let id = (DBSYSTEM === 'COSMODB' ? req.userId: ObjectId(req.userId));
+  let id = (DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId));
   let candidatoData = req.body;
   if (candidatoData) {
     update(id, candidatoData, "CHILD_DATA", res);
@@ -155,4 +156,38 @@ exports.postDeleteProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
+};
+
+exports.updateCandidatoPassword = (req, res, next) => {
+  console.log('req.body', req.body)
+  Candidato.find({ passwordResetHash: req.body.passwordResetHash })
+    .then((candidatoResult) => {
+      if (candidatoResult) {
+
+        const candidatoUpdateData = {
+          ...candidatoResult,
+          password: bcrypt.hashSync(req.body.password, 10),
+          passwordResetHash: null,
+          passwordResetDateTime: null
+        }
+
+        const candidato = new Candidato(
+          ...Object.values(candidatoUpdateData)
+        )
+        candidato.save()
+          .then((result) => {
+            res.status(200).json({ success: true, message: `Contraseña cambiada exitosamente`});
+          }).catch((err) => {
+            console.log('error', err);
+            res.status(500).json({
+              success: false,
+              message: "Error de comunicación",
+            });
+          });
+      } else {
+        res.status(500).send({ success: false, message: "No se encontraron datos" });
+      }
+    }).catch((err) => {
+      console.log('err', err)
+    });
 };

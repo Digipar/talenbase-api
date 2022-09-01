@@ -12,6 +12,7 @@ verifyToken = (req, res, next) => {
     });
   }
   jwt.verify(token, TOKEN_SECRET, (err, decoded) => {
+    console.log('err', err)
     if (err) {
       return res.status(401).send({
         message: "No autorizado!",
