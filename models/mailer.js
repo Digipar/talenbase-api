@@ -7,7 +7,7 @@ class Mailer {
     constructor(tipo, direccion, candidatoId, cuerpo) {
         this.fechaHora = moment().format('YYYY-MM-DD HH:mm:ss');
         this.tipo = tipo;
-        this.encabezado = tipo == 'ACTIVACION' ? 'Activación de cuenta - Talenbase' : 'Recueración de cuenta - Talenbase';
+        this.encabezado = tipo == 'ACTIVACION' ? 'Activación de cuenta - Talenbase' : 'Recuperación de cuenta - Talenbase';
         this.cuerpo = cuerpo;
         this.direccion = direccion;
         this.estado = 2;
