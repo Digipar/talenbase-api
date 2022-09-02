@@ -168,7 +168,8 @@ exports.updateCandidatoPassword = (req, res, next) => {
           ...candidatoResult,
           password: bcrypt.hashSync(req.body.password, 10),
           passwordResetHash: null,
-          passwordResetDateTime: null
+          passwordResetDateTime: null,
+          emailValidated: true
         }
 
         const candidato = new Candidato(
