@@ -8,6 +8,59 @@ const CryptoJS = require("crypto-js");
 const moment = require('moment');
 
 
+exports.registerMailerAcivateAccount = (req, res, next) => {
+    if (req.id) {
+        const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${req.id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
+        const mailer = new Mailer(
+            'ACTIVACION', req.email, req.id, cuerpo
+        );
+        mailer.save()
+            .then((result2) => {
+                res.status(200).json(result);
+            }).catch((err) => {
+                console.log('error mailer', err);
+                res.status(500).json({
+                    success: false,
+                    message: "Error de comunicación",
+                });
+            });
+    } else {
+        Candidato.find({ email: req.email })
+            .then((candidatoResult) => {
+                if (candidatoResult) {
+                    const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${candidatoResult._id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
+                    const mailer = new Mailer(
+                        'ACTIVACION', req.email, candidatoResult._id, cuerpo
+                    );
+                    mailer.save()
+                        .then((result2) => {
+                            res.status(200).json(result);
+                        }).catch((err) => {
+                            console.log('error mailer', err);
+                            res.status(500).json({
+                                success: false,
+                                message: "Error de comunicación",
+                            });
+                        });
+
+
+                } else {
+                    res.status(500).json({
+                        success: false,
+                        message: "Email inválido",
+                    });
+                }
+            }).catch((err) => {
+                console.log('err1', err)
+                res.status(500).json({
+                    success: false,
+                    message: "Error de comunicación",
+                });
+            });
+    }
+
+
+};
 
 exports.registerMailerResetPass = (req, res, next) => {
     console.log('req.body', req.body)
