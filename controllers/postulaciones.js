@@ -7,6 +7,10 @@ const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
 
 
 exports.registerPostulacion = (req, res, next) => {
+  if (!req.body.solicitudId) {
+    res.status(404).send({ success: false, message: "No se recibieron datos" });
+    return false;
+  }
   const solicitudId = req.body.solicitudId;
   const candidatoId = req.userId;
 
