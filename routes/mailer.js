@@ -4,6 +4,7 @@ const mailerController = require('../controllers/mailer');
 const { authJwt } = require('../middleware');
 
 router.post('/register-mailer-reset-pass', mailerController.registerMailerResetPass);
+router.post('/register-mailer-activate-account', mailerController.registerMailerAcivateAccount);
 
 router.use(function(req, res, next) {
     console.log('error 404 por código inválido');
