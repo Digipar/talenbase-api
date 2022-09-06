@@ -8,6 +8,41 @@ const CryptoJS = require("crypto-js");
 const moment = require('moment');
 
 
+exports.registerMailerAcivateAccount = (req, res, next) => {
+        Candidato.find({ email: req.body.email })
+            .then((candidatoResult) => {
+                if (candidatoResult) {
+                    console.log('candidatoResult', candidatoResult)
+                    const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${candidatoResult._id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
+                    const mailer = new Mailer(
+                        'ACTIVACION', req.body.email, candidatoResult._id, cuerpo
+                    );
+                    mailer.save()
+                        .then((result) => {
+                            res.status(200).json(result);
+                        }).catch((err) => {
+                            console.log('error mailer', err);
+                            res.status(500).json({
+                                success: false,
+                                message: "Error de comunicación",
+                            });
+                        });
+
+
+                } else {
+                    res.status(500).json({
+                        success: false,
+                        message: "Email inválido",
+                    });
+                }
+            }).catch((err) => {
+                console.log('err1', err)
+                res.status(500).json({
+                    success: false,
+                    message: "Error de comunicación",
+                });
+            });
+};
 
 exports.registerMailerResetPass = (req, res, next) => {
     console.log('req.body', req.body)
