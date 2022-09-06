@@ -23,13 +23,13 @@ exports.login = async (req, res) => {
     );
     if (!passwordIsValid) {
       return res.status(401).send({
-        message: "Contraseña inválida",
+        message: "Contraseña inválida"
       });
     }
 
     if (!user.emailValidated) {
       return res.status(401).send({
-        message: "Email no validado",
+        message: "Email no validado",emailNotValidated: true
       });
     }
     console.log('user to sign', user)
