@@ -1,13 +1,26 @@
-const path = require("path");
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import { PORT } from "./config/config.js";
 
-const app = require("./app")
+import solicitudTestRouter from "./routes/solicitud.js";
 
-const mongoConnect = require("./util/database").mongoConnect;
 
-app.listen(8080, () => {
-  console.log("Talenbase connected, API is listening on port 8080");
+
+const app = express();
+app.use(cors());
+
+app.use(bodyParser.json());
+
+app.use(
+    "/solicitudes",
+    solicitudTestRouter,
+);
+
+app.listen(PORT || 3001, () => {
+    console.log(`Server is running on port ${PORT || 3001}`);
 });
 
-mongoConnect(() => {
-  console.log("MongoDB Connected");
+app.use((req, res) => {
+    res.status(404).send("Not found");
 });

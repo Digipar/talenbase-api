@@ -1,28 +1,39 @@
-require('dotenv').config();
-const jwt = require("jsonwebtoken");
+import jsonwebtoken from 'jsonwebtoken';
+const { verify } = jsonwebtoken;
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
-// const Candidato = require("../models/").Candidato;
-// const User = db.user;
-verifyToken = (req, res, next) => {
-  console.log('verifyToken...')
-  let token = req.headers["x-access-token"];
-  if (!token) {
-    return res.status(403).send({
-      message: "Token no recibido!",
-    });
-  }
-  jwt.verify(token, TOKEN_SECRET, (err, decoded) => {
-    console.log('err', err)
-    if (err) {
-      return res.status(401).send({
-        message: "No autorizado!",
-      });
+const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImV2YWxpYSIsImlhdCI6MTY3ODQ1MzU1N30.P7WLHRWMcPNa-XLegruv14hi0OD97DMKyrcxWqlxLgo'
+
+
+
+const verifyToken = (req, res, next) => {
+    // console.log('verifyToken...')
+    let authorization = req.headers["authorization"]
+    let token = req.headers["token"];
+    
+    if ('Bearer '+ BEARER_TOKEN === authorization) {
+        next();
+        return true
     }
-    req.userId = decoded.id;
-    next();
-  });
+
+    if (!token) {
+        return res.status(403).send({
+            message: "Token no recibido!",
+        });
+    }
+
+    verify(token, TOKEN_SECRET, (err, decoded) => {
+        console.log('err', err)
+        if (err) {
+            return res.status(401).send({
+                message: "No autorizado!",
+                type:"tokenError"
+            });
+        }
+        req.userId = decoded.id;
+        next();
+    });
 };
 const authJwt = {
-  verifyToken
-  };
-module.exports = authJwt;
+    verifyToken
+};
+export default authJwt;
