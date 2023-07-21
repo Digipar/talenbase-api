@@ -27,7 +27,7 @@ const getPostulanteSolicitudByCandidatoId = async (req, res) => {
 };
 const registerPostulacion = async(req,res)=>{
 
-  try {
+  try { 
     const user = await SPR.get(
       SHAREPOINT_API +
         `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title&$filter=Id eq ${req.body.CandidatoId} `
