@@ -1,107 +1,90 @@
-require('dotenv').config();
-const TOKEN_SECRET = process.env.TOKEN_SECRET || null;
+import cryptoJs from 'crypto-js';
+import { SPR } from "../connection/connection.js"; 
+import jsonwebtoken from 'jsonwebtoken';
+const { sign } = jsonwebtoken;
+const { AES, enc } = cryptoJs
+const passwordKey = 'T@L3NB@S3'
+import { SHAREPOINT_API, SITE_URL,TOKEN_SECRET } from "../config/config.js";
+import md5 from "md5";
+ 
 
-const User = require("../models/candidato");
-const Mailer = require("../models/mailer");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const login = async (req, res) => { 
+    try {
+        const result = await SPR.get(
+            SHAREPOINT_API +
+            `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title,NombreApellido,Email,Contrasenha&$filter=Email eq '${req.body.email}'`
+        );  
+        if (result.body.d.results.length) {
 
-exports.login = async (req, res) => {
-  try {
-    const user = await User.find({
-      email: req.body.email
-    });
-    // const user = null;
-    if (!user) {
-      return res.status(404).send({ message: "Email desconocido" });
-    }
-    // const passwordIsValid = false;
+            const decryptPass = AES.decrypt(req.body.password,passwordKey).toString(enc.Utf8) 
+            
+            if (decryptPass !== result.body.d.results[0].Contrasenha) {
+                return res.status(401).json({ message: "usuario o contraseña incorrectos" });
+            }
 
-    const passwordIsValid = bcrypt.compareSync(
-      req.body.password,
-      user.password
-    );
-    if (!passwordIsValid) {
-      return res.status(401).send({
-        message: "Contraseña inválida"
-      });
-    }
-
-    if (!user.emailValidated) {
-      return res.status(401).send({
-        message: "Email no validado",emailNotValidated: true
-      });
-    }
-    console.log('user to sign', user)
-    const token = jwt.sign({ id: user._id }, TOKEN_SECRET, {
-      expiresIn: 86400, // 24 hours
-    });
-    // req.session.token = token;
-
-    return res.status(200).send({
-      // id: user._id,
-      username: user.email,
-      email: user.email,
-      name: user.nombreCompleto,
-      accessToken: token
-    });
-  } catch (error) {
-    return res.status(500).send({ message: error.message });
-  }
-};
-
-exports.register = (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const nombreCompleto = req.body.nombreCompleto;
-
-  const user = new User(
-    null, email, password, "", nombreCompleto,
-    "", "", "", "", "", "",
-    "", "", "", false,
-    "", [], [], [], [], [], false
-  );
-  user.save()
-    .then((result) => {
-      console.log('result candidato', result);
-      console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
-      const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${result.id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
-      const mailer = new Mailer(
-        'ACTIVACION', email, result.id, cuerpo
-      );
-      if (result.success) {
-        mailer.save()
-          .then((result2) => {
-            res.status(200).json(result);
-          }).catch((err) => {
-            console.log('error mailer', err);
-            res.status(500).json({
-              success: false,
-              message: "Error de comunicación",
+            const token = await sign({ id: result.body.d.results[0].Id }, TOKEN_SECRET, {
+                expiresIn: 86400, // 24 hours 
             });
-          });
-      } else {
-        res.status(500).json(result);
-      }
 
-    })
-    .catch((err) => {
-      console.log('err', err);
-      res.status(500).json({
-        success: false,
-        message: "Error de comunicación",
-      });
-    });
+            const data = {
+                name: result.body.d.results[0].NombreApellido,
+                email: result.body.d.results[0].Email,
+                accessToken: token,
+                colaboradorId: result.body.d.results[0].Id
+            }
+             return res.status(200).json(data);
+        } else {
+             return res.status(401).json({ message: "usuario o contraseña incorrectos" });
+        }
+    } catch (error) {
+        console.log('error :>> ', error.message);
+        return res.status(500).json({ message: error.message });
+    }
 };
+const register = async (req, res) => {
+    
+    try {
+        const digest = await SPR.requestDigest(SITE_URL);
+        
+         
+          let body = {
+            __metadata: { type: "SP.Data.CandidatoListItem" },
+            Title:'',
+            NombreApellido: req.body.nombreCompleto,
+            Email: req.body.email,
+            Contrasenha:md5(req.body.password),
+            Sexo:'',
+            Posgrado:'false',
+            CursandoActual:'false'
+          };
+          const reqOptions = {
+            headers: {
+                "X-RequestDigest": digest,
+                Accept: "application/json;odata=verbose",
+                "Content-Type": "application/json;odata=verbose",
+                "X-HTTP-Method": "POST",
+            },
+            body: body,
+          };
+          const result = await SPR.post(
+            `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items`,
+            reqOptions
+          );
+          if (result.statusCode >= 400 && result.statusCode <= 500) {
+            throw new Error("Bad fetch response CandidatoUpdate", {
+              statusCode: result.statusCode,
+              statusMessage: result.statusMessage,
+            });
+          }
 
+           
 
-// exports.signout = async (req, res) => {
-//   try {
-//     req.session = null;
-//     return res.status(200).send({
-//       message: "You've been signed out!"
-//     });
-//   } catch (err) {
-//     this.next(err);
-//   }
-// }; 
+       
+          res.status(result.statusCode).json(result.statusMessage);
+      } catch (error) {
+        console.log("error",error)
+        res.status(500).json({ message: error.message });
+      }
+}
+
+export { login,register };
