@@ -1,0 +1,8 @@
+MONGO_SERVER_PART1="mongodb+srv://vmartinetti:Y3a1HslsyZw07VQ8@cluster0.u3oly.mongodb.net/"
+MONGO_SERVER_PART2="?retryWrites=true&w=majority"
+DB="talenbase_test"
+HOST="localhost:8080"
+APP_HOST="localhost:3000"
+PORT="8080"
+TOKEN_SECRET="victor-martinetti-secret-token"
+DBSYSTEM="MONGODB"

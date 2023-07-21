@@ -1,194 +1,397 @@
-const ObjectId = require("mongodb").ObjectID;
-const Candidato = require("../models/candidato");
-require("dotenv").config();
-require('dotenv').config();
-const bcrypt = require('bcryptjs');
-const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
+import { SPR } from "../connection/connection.js";
+import { SHAREPOINT_API, SITE_URL } from "../config/config.js";
+import moment from "moment-timezone";
 
+export const getCandidato = async (req, res, next) => {
+  try {
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title,Email,Contrasenha,Nacionalidad,FechaNacimiento,EstadoCivil,Telefono&$filter=Email eq '${req.params.email}'`
+    );
+    if (result.body?.d?.results?.length) {
+      return res.status(200).json(result.body.d.results[0]);
+    } else {
+      return res.status(204).json({ message: "Candidato no Existe" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const getCandidatoIdioma = async (req, res, next) => {
+  try {
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'CandidatoIdioma\')/items?$select=*,Id,Title,Nivel,IdiomaId,Idioma/Title&$expand=Idioma&$filter=CandidatoId eq '${req.params.id}'`
+    );
+    if (result.body?.d?.results?.length) {
+      return res.status(200).json(result.body.d.results);
+    } else {
+      return res.status(200).json([]);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const getCandidatoExperienciaLaboral = async (req, res, next) => {
+  try {
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'CandidatoExperienciaLaboral\')/items?$select=*&$filter=CandidatoId eq '${req.params.id}'`
+    );
+    if (result.body?.d?.results?.length) {
+      return res.status(200).json(result.body.d.results);
+    } else {
+      return res.status(200).json([]);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const getCandidatoReferenciaPersonal = async (req, res, next) => {
+  try {
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'CandidatoReferenciaPersonal\')/items?$select=*&$filter=CandidatoId eq '${req.params.id}'`
+    );
+    if (result.body?.d?.results?.length) {
+      return res.status(200).json(result.body.d.results);
+    } else {
+      return res.status(200).json([]);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-const update = (id, candidatoData, action, res) => {
-  Candidato.findById(id)
-    .then((encontrado) => {
-      console.log("encontrado", encontrado);
-      if (encontrado) {
-        encontrado = { ...encontrado, ...candidatoData };
-        switch (action) {
-          case "UPDATE":
-            encontrado = { ...encontrado, actualizar: true };
-            break;
-          case "ACTIVATE":
-            encontrado = { ...encontrado, emailValidated: true };
+export const updateCandidato = async (req, res, next) => {
+  try {
+    const digest = await SPR.requestDigest(SITE_URL);
 
-            break;
-          case "ACADEMIC":
-            encontrado = { ...encontrado, candidatoData, actualizar: true };
+    let body = {
+      __metadata: { type: "SP.Data.CandidatoListItem" },
+      Title: `${req.body.Title}`,
+      NombreApellido: req.body.NombreApellido,
+      FechaNacimiento: moment
+        .tz(req.body.FechaNacimiento, "America/Asuncion")
+        .toISOString(),
+      Nacionalidad: req.body.Nacionalidad,
+      EstadoCivil: req.body.EstadoCivil,
+      DomicilioPais: req.body.DomicilioPais,
+      DomicilioDepartamento: req.body.DomicilioDepartamento,
+      DomicilioCiudad: req.body.DomicilioCiudad,
+      DomicilioDireccion: req.body.DomicilioDireccion,
+      Telefono: req.body.Telefono,
+      Email: req.body.Email,
+      Sexo: req.body.Sexo,
+    };
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "If-Match": "*",
+        "X-HTTP-Method": "MERGE",
+      },
+      body: body,
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items(${req.body.Id})`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
 
-            break;
-          case "LANGUAGE":
-            encontrado = { ...encontrado, candidatoData, actualizar: true };
+    res.status(result.statusCode).json(result.statusMessage);
+  } catch (error) {
+    console.log("error :>> ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
-          case "PREVIOUS_EXPERIENCE":
-            encontrado = { ...encontrado, candidatoData, actualizar: true };
+export const updateAcademicData = async (req, res, next) => {
+  try {
+    const digest = await SPR.requestDigest(SITE_URL);
+    let body = {
+      __metadata: { type: "SP.Data.CandidatoListItem" },
+      FormacionAcademica: req.body.FormacionAcademica,
+      CursandoActual: req.body.CursandoActual,
+      EgresoAnio: `${req.body.EgresoAnio}`,
+      TituloObtenido: req.body.TituloObtenido,
+      Posgrado: req.body.Posgrado,
+      PosgradoEn: req.body.PosgradoEn,
+      Institucion: req.body.Institucion,
+      FormacionPais: req.body.FormacionPais,
+      FormacionCiudad: req.body.FormacionCiudad,
+      ConocimientoInformatica: req.body.ConocimientoInformatica,
+    };
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "If-Match": "*",
+        "X-HTTP-Method": "MERGE",
+      },
+      body: body,
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items(${req.body.Id})`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
 
-            break;
-          case "CHILD_DATA":
-            encontrado = { ...encontrado, candidatoData, actualizar: true };
+    res.status(result.statusCode).json(result.statusMessage);
+  } catch (error) {
+    console.log("error :>> ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
-            break;
-
-          default:
-            break;
-        }
-        console.log("encontrado", encontrado);
-
-        const candidato = new Candidato(
-          ...Object.values(encontrado),
-        );
-
-        candidato.save()
-          .then((result) => {
-            console.log(`Candidato ${action}D`);
-            res.status(200).json(result);
-          })
-          .catch((err) => console.log(err));
-      } else {
-        console.log("no encontrado");
-        res.status(401).send({ success: false, message: "Usuario inválido" });
-        // .send({success: false, message: 'No encontrado'});
+export const updateLanguageData = async (req, res, next) => {
+  try {
+    const digest = await SPR.requestDigest(SITE_URL);
+    await req.body.language.forEach(async (idioma) => {
+      let body = {
+        __metadata: { type: "SP.Data.CandidatoIdiomaListItem" },
+        Title: idioma.value,
+        Nivel: idioma.nivel,
+        CandidatoId: idioma.colaboradorId,
+        IdiomaId: idioma.idiomaId,
+      };
+      const reqOptions = {
+        headers: {
+          "X-RequestDigest": digest,
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+          "If-Match": "*",
+          "X-HTTP-Method": "MERGE",
+        },
+        body: body,
+      };
+      const result = await SPR.post(
+        `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoIdioma')/items(${idioma.id})`,
+        reqOptions
+      );
+      if (result.statusCode >= 400 && result.statusCode <= 500) {
+        throw new Error("Bad fetch response CandidatoIdiomaUpdate", {
+          statusCode: result.statusCode,
+          statusMessage: result.statusMessage,
+        });
       }
-    })
-    .catch((err) => {
-      console.log("Ups: ", err);
-      // return -1;
-      res.status(404).send({ success: false, message: "No encontrado" });
     });
-};
-
-exports.activate = (req, res, next) => {
-  console.log("Activar cuenta req.params.id", req.params.id);
-  let id = DBSYSTEM === 'COSMODB' ? req.params.id : ObjectId(req.params.id);
-  update(id, null, "ACTIVATE", res);
-};
-
-exports.updateCandidato = (req, res, next) => {
-  console.log("Update candidato req.userId", req.userId);
-  console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
-  let candidatoData = req.body;
-  if (candidatoData) {
-    update(id, candidatoData, "UPDATE", res);
-  } else {
-    // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "No se recibieron datos" });
+    res.status(200).json("OK");
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
-exports.updateAcademicData = (req, res, next) => {
-  console.log("Update candidato req.userId", req.userId);
-  console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
-  let candidatoData = req.body;
-  if (candidatoData) {
-    update(id, candidatoData, "ACADEMIC", res);
-  } else {
-    // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "No se recibieron datos" });
+export const updatePreviousExperience = async (req, res, next) => {
+  try { 
+    const digest = await SPR.requestDigest(SITE_URL);
+    let body = {
+      __metadata: { type: "SP.Data.CandidatoExperienciaLaboralListItem" },
+      Title: req.body.Title,
+      Cargo: req.body.Cargo,
+      FechaDesde: req.body.FechaDesde
+        ? moment.tz(req.body.FechaDesde, "America/Asuncion").toISOString()
+        : null,
+      FechaHasta: req.body.FechaHasta
+        ? moment.tz(req.body.FechaHasta, "America/Asuncion").toISOString()
+        : null,
+      ActividadDesarrollada: req.body.ActividadDesarrollada,
+      MotivoSalida: req.body.MotivoSalida,
+      ReferenciaLaboralNombre: req.body.ReferenciaLaboralNombre,
+      ReferenciaLaboralTelefono: req.body.ReferenciaLaboralTelefono,
+      ReferenciaLaboralEmail: req.body.ReferenciaLaboralEmail,
+      Pasantia: req.body.Pasantia  ,
+      CandidatoId: req.body.colaboradorId,
+    };
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "X-HTTP-Method": "POST",
+      },
+      body: body,
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoExperienciaLaboral')/items`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoExperienciaLaboralUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
+    const dataToSend = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'CandidatoExperienciaLaboral\')/items?$select=*&$filter=CandidatoId eq '${req.body.colaboradorId}'`
+    );
+    if (dataToSend.body?.d?.results?.length) {
+      return res.status(200).json(dataToSend.body.d.results);
+    } else {
+      throw new Error("No data found", {
+        statusCode: dataToSend.statusCode,
+        statusMessage: dataToSend.statusMessage,
+      });
+    }
+ 
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
-exports.updateLanguageData = (req, res, next) => {
-  console.log("Update candidato req.userId", req.userId);
-  console.log("Update candidato body", req.body);
-  let id = DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId);
-  let candidatoData = req.body;
-  if (candidatoData) {
-    update(id, candidatoData, "LANGUAGE", res);
-  } else {
-    // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "No se recibieron datos" });
-  }
-};
 
-exports.updatePreviousExperience = (req, res, next) => {
-  console.log("create previous experience req.userId", req.userId);
-  console.log("create previous experience body", req.body);
-  let id = (DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId));
-  let candidatoData = req.body;
-  if (candidatoData) {
-    update(id, candidatoData, "PREVIOUS_EXPERIENCE", res);
-  } else {
-    // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "No se recibieron datos" });
-  }
-}
-exports.updateChildData = (req, res, next) => {
-  console.log("create CHILD DATA req.userId", req.userId);
-  console.log("create CHILD DATA body", req.body);
-  let id = (DBSYSTEM === 'COSMODB' ? req.userId : ObjectId(req.userId));
-  let candidatoData = req.body;
-  if (candidatoData) {
-    update(id, candidatoData, "CHILD_DATA", res);
-  } else {
-    // To Do: this case could be validated in the route definition
-    res.status(404).send({ success: false, message: "No se recibieron datos" });
-  }
-}
-
-exports.getCandidatos = (req, res, next) => {
-  Candidato.fetchAll()
-    .then((candidato) => {
-      res.status(200).json(candidato);
-    })
-    .catch((err) => console.log(err));
-};
-
-exports.getCandidato = (req, res, next) => {
-  Candidato.findByEmail(req.params.email)
-    .then((candidato) => {
-      res.status(200).json(candidato);
-    })
-    .catch((err) => console.log(err));
-};
-
-exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.deleteById(prodId)
-    .then((result) => {
-      console.log("DESTROYED PRODUCT");
-      res.redirect("/admin/products");
-    })
-    .catch((err) => console.log(err));
-};
-
-exports.updateCandidatoPassword = (req, res, next) => {
-  console.log('req.body', req.body)
-  Candidato.find({ passwordResetHash: req.body.passwordResetHash })
-    .then((candidatoResult) => {
-      if (candidatoResult) {
-
-        const candidatoUpdateData = {
-          ...candidatoResult,
-          password: bcrypt.hashSync(req.body.password, 10),
-          passwordResetHash: null,
-          passwordResetDateTime: null,
-          emailValidated: true
-        }
-
-        const candidato = new Candidato(
-          ...Object.values(candidatoUpdateData)
-        )
-        candidato.save()
-          .then((result) => {
-            res.status(200).json({ success: true, message: `Contraseña cambiada exitosamente`});
-          }).catch((err) => {
-            console.log('error', err);
-            res.status(500).json({
-              success: false,
-              message: "Error de comunicación",
-            });
-          });
-      } else {
-        res.status(500).send({ success: false, message: "No se encontraron datos" });
+export const deletePreviousExperience = async (req, res, next) => {
+  try { 
+    const digest = await SPR.requestDigest(SITE_URL);
+  
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "IF-MATCH": "*",
+        "X-HTTP-Method": "DELETE",
       }
-    }).catch((err) => {
-      console.log('err', err)
-    });
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoExperienciaLaboral')/items(${req.params.id})`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoExperienciaLaboralUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
+    
+
+    res.status(result.statusCode).json(result.statusMessage);
+  } catch (error) {
+    console.log("error :>> ", error)
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updatePersonalReference = async (req, res, next) => {
+  try { 
+    const digest = await SPR.requestDigest(SITE_URL);
+    let body = {
+      __metadata: { type: "SP.Data.CandidatoReferenciaPersonalListItem" },
+      Title: req.body.Title,
+      Telefono: req.body.Telefono,
+      CandidatoId: req.body.colaboradorId, 
+    };
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "X-HTTP-Method": "POST",
+      },
+      body: body,
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoReferenciaPersonal')/items`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoExperienciaLaboralUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
+    const dataToSend = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'CandidatoReferenciaPersonal\')/items?$select=*&$filter=CandidatoId eq '${req.body.colaboradorId}'`
+    );
+    if (dataToSend.body?.d?.results?.length) {
+      return res.status(200).json(dataToSend.body.d.results);
+    } else {
+      throw new Error("No data found", {
+        statusCode: dataToSend.statusCode,
+        statusMessage: dataToSend.statusMessage,
+      });
+    }
+ 
+  } catch (error) {
+    console.log("error :>> ", error)
+    res.status(500).json({ message: error.message });
+  }
+};
+export const deletePersonalReference = async (req, res, next) => {
+  try { 
+    const digest = await SPR.requestDigest(SITE_URL);
+  
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "IF-MATCH": "*",
+        "X-HTTP-Method": "DELETE",
+      }
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoReferenciaPersonal')/items(${req.params.id})`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoReferenciaPersonalUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
+    res.status(result.statusCode).json(result.statusMessage);
+  } catch (error) {
+    console.log("error :>> ", error)
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateDepartments =  async(req,res)=>{
+  try {
+    const digest = await SPR.requestDigest(SITE_URL); 
+    let body = {
+      __metadata: { type: "SP.Data.CandidatoListItem" },
+      Departamento1Id: req.body.data[0].Id,
+      Departamento2Id: req.body.data.length > 1 ? req.body.data[1].Id : null,
+      Departamento3Id: req.body.data.length > 2 ? req.body.data[2].Id : null,
+    };
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        Accept: "application/json;odata=verbose",
+        "Content-Type": "application/json;odata=verbose",
+        "If-Match": "*",
+        "X-HTTP-Method": "MERGE",
+      },
+      body: body,
+    };
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items(${req.body.colaboradorId})`,
+      reqOptions
+    );
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response CandidatoUpdate", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
+
+    res.status(result.statusCode).json(result.statusMessage);
+  } catch (error) {
+    console.log("error :>> ", error);
+    res.status(500).json({ message: error.message });
+  }
 };
