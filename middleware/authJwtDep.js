@@ -5,17 +5,23 @@ const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImV2YWxpYSIsI
 
 
 
-export const verifyToken = async(req, res, next) => {
+export const verifyToken = (req, res, next) => {
     // console.log('verifyToken...') 
-    const token = req.headers["x-access-token"];
-    if (!token || token === "null") {
-      return res.status(401).send({
-        message: "NO_TOKEN_PROVIDED",
-      });
+    let authorization = req.headers["authorization"]
+    let token = req.headers["token"];
+    
+    if ('Bearer '+ BEARER_TOKEN === authorization) {
+        next();
+        return true
     }
 
-    verify(token, TOKEN_SECRET, (err, decoded) => {
+    if (!token) {
+        return res.status(403).send({
+            message: "Token no recibido!",
+        });
+    }
 
+    verify(token, TOKEN_SECRET, (err, decoded) => { 
         if (err) {
             return res.status(401).send({
                 message: "No autorizado!",

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,9 +18,14 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "mongodb": "^4.7.0",
     "morgan": "~1.9.1",
     "sp-request": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

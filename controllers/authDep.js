@@ -31,8 +31,7 @@ exports.login = async (req, res) => {
       return res.status(401).send({
         message: "Email no validado",emailNotValidated: true
       });
-    }
-    console.log('user to sign', user)
+    } 
     const token = jwt.sign({ id: user._id }, TOKEN_SECRET, {
       expiresIn: 86400, // 24 hours
     });
@@ -63,8 +62,7 @@ exports.register = (req, res, next) => {
   );
   user.save()
     .then((result) => {
-      console.log('result candidato', result);
-      console.log(`http://${process.env.APP_HOST}/activate-account/${result.id}`);
+ 
       const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${result.id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
       const mailer = new Mailer(
         'ACTIVACION', email, result.id, cuerpo

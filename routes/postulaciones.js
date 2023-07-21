@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { getPostulanteSolicitudByCandidatoId } from '../controllers/postulaciones.js';
-import authJwt from '../middleware/authJwt.js';
+import { getPostulanteSolicitudByCandidatoId,registerPostulacion } from '../controllers/postulaciones.js';
+import { verifyToken } from '../middleware/authJwt.js';
 const postulacionRouter = Router();
 
 /* To Do: validate JWT token */
 
-// router.post('/registrar-postulacion', [authJwt.verifyToken], postulacionesController.registerPostulacion);
+postulacionRouter.post('/registrar-postulacion', [verifyToken], registerPostulacion);
 // router.post('/filtrar-postulacion', postulacionesController.findByFilterPostulacion);
 // router.post('/find-by-candidato-postulacion', [authJwt.verifyToken], postulacionesController.findByCandidatoIdPostulacion);
-postulacionRouter.post('/find-by-candidato-postulacion', [authJwt.verifyToken], (req, res, next) => {
+postulacionRouter.post('/find-by-candidato-postulacion',[verifyToken], (req, res, next) => {
   getPostulanteSolicitudByCandidatoId(req, res)
 });
 

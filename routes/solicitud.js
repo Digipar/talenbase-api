@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getAll, findSolicitudAbierta, getSolicitud } from '../controllers/solicitudes.js';
-import authJwt from '../middleware/authJwt.js';
+import { verifyToken } from '../middleware/authJwt.js';
 const solicitudRouter = Router();
 
-solicitudRouter.get('/', [authJwt.verifyToken], (req, res, next) => {
+solicitudRouter.get('/', (req, res, next) => {
     getAll(req, res)
 });
 

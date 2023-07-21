@@ -19,8 +19,7 @@ const getAll = async (req, res) => {
     try {
         const solicitudArray = [];
         const url = `${SHAREPOINT_API}web/lists/GetByTitle(\'Solicitud\')/items?${selectString}${expandString}`;
-        await getSolicitudes(url, solicitudArray);
-        console.log('solicitudArray', solicitudArray)
+        await getSolicitudes(url, solicitudArray); 
         res.status(200).json(solicitudArray);
     } catch (error) {
         res.status(500).json(error);
@@ -28,7 +27,7 @@ const getAll = async (req, res) => {
 };
 
 const getSolicitud = async (req, res) => {
-    try {
+    try { 
         const filter=`Id eq ${req.params.Id}`
         const solicitudArray = [];
         const url = `${SHAREPOINT_API}web/lists/GetByTitle(\'Solicitud\')/items?${selectString}${expandString}&$filter=${filter}`;

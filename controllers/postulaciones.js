@@ -12,108 +12,71 @@ const getPostulantesSolicitudes = async (url, array) => {
     return array;
   }
 };
-
-
 const getPostulanteSolicitudByCandidatoId = async (req, res) => {
-  try {
-    const filter = `CandidatoId eq ${req.CandidatoId}`
+  try { 
+    const filter = `CandidatoId eq ${req.body.CandidatoId}`
     const solicitudesAbiertasArray = [];
     const url = `${SHAREPOINT_API}web/lists/GetByTitle(\'PostulanteSolicitud\')/items?${selectString}${expandString}&$filter=${filter}`;
-    await getSolicitudes(url, solicitudesAbiertasArray);
+ 
+    await getPostulantesSolicitudes(url, solicitudesAbiertasArray);
     res.status(200).json(solicitudesAbiertasArray);
   } catch (error) {
+    console.log("error :>> ", error);
     res.status(500).json(error);
   }
 };
+const registerPostulacion = async(req,res)=>{
 
-export { getPostulanteSolicitudByCandidatoId }
+  try {
+    const user = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title&$filter=Id eq ${req.body.CandidatoId} `
+    ); 
+    if (user.body?.d?.results[0].Title === null) {
+      res.status(500).json({
+        success: false,
+        message: "NO PERSONAL DATA"
+      });
+      return ;
+    }
 
-// const ObjectId = require("mongodb").ObjectID;
-// const Postulacion = require("../models/postulacion");
-// const Candidato = require("../models/candidato");
-// require("dotenv").config();
-// require('dotenv').config();
-// const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
+    const body = {
+      __metadata: { type: "SP.Data.PostulanteSolicitudListItem" }, 
+      CandidatoId: req.body.CandidatoId,
+      SolicitudId: req.body.SolicitudId,
+      Title:user.body.d.results[0].Title
+    };
+    const digest = await SPR.requestDigest(SITE_URL);
 
+    const reqOptions = {
+      headers: {
+        "X-RequestDigest": digest,
+        "X-HTTP-Method": "POST",
+        "Content-Type": "application/json;odata=verbose",
+        "Accept": "application/json;odata=verbose"
+      },
+      body: body
+    };
 
+    const result = await SPR.post(
+      `${SHAREPOINT_API}web/lists/GetByTitle(\'PostulanteSolicitud\')/items`,
+      reqOptions
+    );
 
-// exports.registerPostulacion = (req, res, next) => {
-//   if (!req.body.solicitudId) {
-//     res.status(404).send({ success: false, message: "No se recibieron datos" });
-//     return false;
-//   }
-//   const solicitudId = req.body.solicitudId;
-//   const candidatoId = req.userId;
+    if (result.statusCode >= 400 && result.statusCode <= 500) {
+      throw new Error("Bad fetch response registerPostulacion", {
+        statusCode: result.statusCode,
+        statusMessage: result.statusMessage,
+      });
+    }
 
-//   Candidato.find({ _id: ObjectId(candidatoId) })
-//     .then((candidatoResult) => {
-//       if (candidatoResult) {
-//         // console.log('candidatoResult', candidatoResult)
-//         if (candidatoResult.docNro) {
-//           const postulacion = new Postulacion(
-//             solicitudId, candidatoId
-//           );
+    res.status(result.statusCode).json(result.statusMessage);
+    
+  } catch (error) {
+    console.log("error :>> ", error) 
+    res.status(500).json({ message: error.message });
+  }
+}
+export { getPostulanteSolicitudByCandidatoId,registerPostulacion }
 
-//           postulacion.save()
-//             .then((result) => {
-//               console.log(result)
-//               res.status(200).json(result);
-//             })
-//             .catch((err) => {
-//               console.log(err.code);
-//               res.status(500).json({
-//                 success: false,
-//                 message: "Error de comunicación",
-//               });
-//             });
-//         } else {
-//           res.status(500).json({
-//             success: false,
-//             message: "NO PERSONAL DATA"
-//           });
-//         }
-
-//       } else {
-//         res.status(500).json({
-//           success: false,
-//           message: "Email inválido",
-//         });
-//       }
-//     }).catch((err) => {
-//       console.log('err1', err)
-//       res.status(500).json({
-//         success: false,
-//         message: "Error de comunicación",
-//       });
-//     });
-// };
-
-// exports.findByFilterPostulacion = (req, res, next) => {
-//   Postulacion.findByFilter(req.body)
-//     .then((result) => {
-//       // console.log(result)
-//       res.status(200).json(result);
-//     }).catch((err) => {
-//       console.log(err.code);
-//       res.status(500).json({
-//         success: false,
-//         message: "Error de comunicación",
-//       });
-//     });
-// };
-
-// exports.findByCandidatoIdPostulacion = (req, res, next) => {
-//   const candidatoId = req.userId;
-//   console.log('candidatoId', candidatoId)
-//   Postulacion.findByCandidatoId(candidatoId)
-//     .then((result) => {
-//       // console.log(result)
-//       res.status(200).json(result);
-//     }).catch((err) => {
-//       console.log(err.code);
-//       res.status(500).json({
-//         success: false,
-//         message: "Error de comunicación",
-//       });
-//     });
-// };
+ 
