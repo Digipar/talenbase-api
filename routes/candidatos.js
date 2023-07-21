@@ -1,25 +1,39 @@
-const express = require('express');
-const router = express.Router();
-const candidatosController = require('../controllers/candidatos');
-const { authJwt } = require('../middleware');
+import { Router } from 'express';
+const candidatoRouter = Router(); 
+import {
+    getCandidato,
+    updateCandidato,
+    updateAcademicData,
+    getCandidatoIdioma,
+    updateLanguageData,
+    getCandidatoExperienciaLaboral,
+    deletePreviousExperience,
+    updatePreviousExperience,
+    getCandidatoReferenciaPersonal,
+    updatePersonalReference,
+    deletePersonalReference,
+    updateDepartments
+  } from "../controllers/candidatos.js";
+import { verifyToken } from '../middleware/authJwt.js';
 
 /* To Do: validate JWT token */
 /* GET candidatos listing. */
-router.get('/', candidatosController.getCandidatos);
-router.get('/:email', candidatosController.getCandidato);
+// candidatoRouter.get('/', getCandidatos);
+candidatoRouter.get('/:email',[verifyToken], getCandidato); 
+candidatoRouter.get('/idiomas/:id',[verifyToken], getCandidatoIdioma); 
+candidatoRouter.put('/update', [verifyToken], updateCandidato);
+candidatoRouter.put('/update-academic-data', [verifyToken], updateAcademicData);
+candidatoRouter.put('/update-language-data', [verifyToken], updateLanguageData);
+candidatoRouter.get('/previous-experience/:id',[verifyToken], getCandidatoExperienciaLaboral); 
+candidatoRouter.put('/update-previous-experience', [verifyToken], updatePreviousExperience);
+candidatoRouter.delete('/delete-previous-experience/:id', [verifyToken], deletePreviousExperience);
+candidatoRouter.get('/personal-reference/:id',[verifyToken], getCandidatoReferenciaPersonal); 
+candidatoRouter.put('/update-personal-reference', [verifyToken], updatePersonalReference);
+candidatoRouter.delete('/delete-personal-reference/:id', [verifyToken], deletePersonalReference);
+candidatoRouter.put('/update-departments', [verifyToken], updateDepartments);
 
 /* UPDATE CANDIDATO */
-router.post('/update-password', candidatosController.updateCandidatoPassword);
-router.put('/update', [authJwt.verifyToken], candidatosController.updateCandidato);
-router.put('/update-academic-data', [authJwt.verifyToken], candidatosController.updateAcademicData);
-router.put('/update-language-data', [authJwt.verifyToken], candidatosController.updateLanguageData);
-router.put('/update-previous-experience', [authJwt.verifyToken], candidatosController.updatePreviousExperience);
-router.put('/update-personal-reference', [authJwt.verifyToken], candidatosController.updateChildData);
-router.put('/update-child-data', [authJwt.verifyToken], candidatosController.updateChildData);
-// router.delete('/delete-previous-experience', [authJwt.verifyToken], candidatosController.deletePreviousExperience);
+// candidatoRouter.post('/update-password', updateCandidatoPassword);
 
-router.use(function(req, res, next) {
-    console.log('error 404 por código inválido');
-    res.status(404).send({success: false, message: 'Código inválido'});
-  });
-module.exports = router;
+
+export default candidatoRouter

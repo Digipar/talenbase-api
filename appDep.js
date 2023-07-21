@@ -6,6 +6,8 @@ var logger = require('morgan');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+import solicitudTestRouter from './routes'
+
 const postulacionesRouter = require("./routes/postulaciones");
 const solicitudesRouter = require("./routes/solicitudes");
 const candidatosRouter = require("./routes/candidatos");
