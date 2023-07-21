@@ -49,6 +49,7 @@ const register = async (req, res) => {
          
           let body = {
             __metadata: { type: "SP.Data.CandidatoListItem" },
+            Title:'',
             NombreApellido: req.body.nombreCompleto,
             Email: req.body.email,
             Contrasenha:md5(req.body.password),
