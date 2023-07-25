@@ -1,0 +1,43 @@
+name: Docker Image CI/CD
+
+on:
+  push:
+    branches: [ "test","main" ]
+  workflow_dispatch:
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login into ACR
+      uses: azure/docker-login@v1
+      with:
+        login-server: 'tricode.azurecr.io'
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: 'tricode.azurecr.io/talenbase/talenbase-api:${{github.ref_name}}'
+  
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Login, pull and up Docker Compose
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: csp-vm-prd01.eastus.cloudapp.azure.com
+        username: ${{ secrets.VM_PRD01_SSH_USER }}
+        key: ${{ secrets.VM_PRD01_SSH_PRIVATE_KEY }}
+        port: 22
+        script: | 
+          docker login tricode.azurecr.io -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }}
+          docker-compose -f /home/digipar/docker-compose-files/docker-compose.talenbase_api.yml pull
+          docker-compose -f /home/digipar/docker-compose-files/docker-compose.talenbase_api.yml up -d
