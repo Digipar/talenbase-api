@@ -6,7 +6,7 @@ import moment from "moment";
 
 
 const getSolicitudes = async (url, array) => {
-    const result = await SPR.get(url);
+    const result = await SPR.get(url); 
     array.push(...result.body.d.results);
     if (result.body.d.__next) {
         await getSolicitudes(result.body.d.__next);
@@ -44,9 +44,12 @@ const findSolicitudAbierta = async (req, res) => {
         const filter =`FechaFinSeleccion ge '${moment().format('YYYY-MM-DD')}'`
         const solicitudesAbiertasArray = [];
         const url = `${SHAREPOINT_API}web/lists/GetByTitle(\'Solicitud\')/items?${selectString}${expandString}&$filter=${filter}`;
+        console.log("url",url   )
         await getSolicitudes(url, solicitudesAbiertasArray);
         res.status(200).json(solicitudesAbiertasArray);
     } catch (error) {
+        console.log("error",error)
+        console.log("error.message",error.message)
         res.status(500).json(error);
     }
 };
