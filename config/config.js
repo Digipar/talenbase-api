@@ -6,3 +6,5 @@ export const PORT = process.env.PORT;
 export const CLIENT_ID = process.env.CLIENT_ID;
 export const CLIENT_SECRET = process.env.CLIENT_SECRET;
 export const TOKEN_SECRET = process.env.TOKEN_SECRET;
+export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+export const APP_HOST = process.env.APP_HOST;
