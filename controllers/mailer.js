@@ -1,106 +1,123 @@
-const ObjectId = require("mongodb").ObjectID;
-const Mailer = require("../models/mailer");
-const Candidato = require("../models/candidato")
-require("dotenv").config();
-require('dotenv').config();
-const DBSYSTEM = process.env.DBSYSTEM || 'MONGODB';
-const CryptoJS = require("crypto-js");
-const moment = require('moment');
+import { SPR } from "../connection/connection.js";
+import { SHAREPOINT_API, SITE_URL, SENDGRID_API_KEY } from "../config/config.js";
+import sgMail from '@sendgrid/mail';
+import {getPasswordResetHtml, getPasswordResetText} from '../constants/index.js';
 
+sgMail.setApiKey(SENDGRID_API_KEY);
+const registerMailerActivateAccount = async (req, res) => {
+  const email = req.body.email;
+  if(!email){
+    return res.status(200).json({
+      success: false,
+      message: "Email no recibido",
+    });
+  }
+  // 1- seek the user exists in the sharepoint list
+  try{
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'Candidato\')/items?$select=Id,NombreApellido&$filter=Email eq '${email}'`
+    );
+    if (result.body?.d?.results?.length) {
+      console.log('Candidato found: ', result.body.d.results[0])
+      
+    } else {
+      console.log('Candidato not found');
+      return res.status(200).json({
+        success: false,
+        message: "Email inválido",
+      });
+    }
+  }
+  catch(error){
+    console.log('error', error);
+    return false;
+  }
+  // 2- send email
+  if (result.body?.d?.results?.length) {
+    console.log('Candidato found: ', result.body.d.results[0])
+    // 2- send email
+    const msg = {
+      to: email,
+      from: 'noreply@digipar.com',
+      subject: 'Activación de cuenta de AGROFERTIL [Talenbase]',
+      text: `
+      Por favor use el siguiente link para activar su cuenta:
+      `,
+      html: `
+      Por favor use el siguiente link para activar su cuenta: <br/>
+      `
+    };
+    try {
+      sgMail.send(msg);
+    }
+    catch(error){
+      console.log('error', error);
+      return res.status(200).json({
+        success: false,
+        message: "Email no pudo ser enviado. Intente nuevamente.",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Email de activación de cuenta enviado",
+    });
+  }     
+}
 
-exports.registerMailerAcivateAccount = (req, res, next) => {
-        Candidato.find({ email: req.body.email })
-            .then((candidatoResult) => {
-                if (candidatoResult) {
-                    console.log('candidatoResult', candidatoResult)
-                    const cuerpo = `Bienvenido a Talenbase, para activar su cuenta ingrese a ` + `http://${process.env.APP_HOST}/activate-account/${candidatoResult._id}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
-                    const mailer = new Mailer(
-                        'ACTIVACION', req.body.email, candidatoResult._id, cuerpo
-                    );
-                    mailer.save()
-                        .then((result) => {
-                            res.status(200).json(result);
-                        }).catch((err) => {
-                            console.log('error mailer', err);
-                            res.status(500).json({
-                                success: false,
-                                message: "Error de comunicación",
-                            });
-                        });
+const registerMailerResetPass = async (req, res) => {
+  const email = req.body.email;
+  if(!email){
+    return res.status(200).json({
+      success: false,
+      message: "Email no recibido",
+    });
+  }
+  // 1- seek the user exists in the sharepoint list
+  try{
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'Candidato\')/items?$select=Id,NombreApellido&$filter=Email eq '${email}'`
+    );
+    if (result.body?.d?.results?.length) {
+      console.log('Candidato found: ', result.body.d.results[0])
+      
+    } else {
+      console.log('Candidato not found');
+      return res.status(200).json({
+        success: false,
+        message: "Email inválido",
+      });
+    }
+  }
+  catch(error){
+    console.log('error', error);
+    return false;
+  }
+  // 2- send email
+  const msg = {
+    to: email,
+    from: 'noreply@digipar.com',
+    subject: 'Cambio de contraseña de AGROFERTIL [Talenbase]',
+    text: getPasswordResetText(email),
+    html: getPasswordResetHtml(email),
+  };
+  try {
+    sgMail.send(msg);
+  }catch(error){
+    console.log('error', error);
+    return res.status(200).json({
+      success: false,
+      message: "Email no pudo ser enviado. Intente nuevamente.",
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    message: "Email de cambio de contraseña enviado",
+  });
+}
 
-
-                } else {
-                    res.status(500).json({
-                        success: false,
-                        message: "Email inválido",
-                    });
-                }
-            }).catch((err) => {
-                console.log('err1', err)
-                res.status(500).json({
-                    success: false,
-                    message: "Error de comunicación",
-                });
-            });
-};
-
-exports.registerMailerResetPass = (req, res, next) => {
-    console.log('req.body', req.body)
-    const direccion = req.body.email;
-    Candidato.find({ email: direccion })
-        .then((candidatoResult) => {
-            if (candidatoResult) {
-
-                const passwordResetHashGenerado = CryptoJS.SHA1(new Date().toISOString().toString()).toString().substring(0, 24);
-                const passwordResetDateTimeGenerado = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                const candidatoUpdateData = {
-                    ...candidatoResult,
-                    passwordResetHash: passwordResetHashGenerado,
-                    passwordResetDateTime: passwordResetDateTimeGenerado
-                }
-
-                const candidato = new Candidato(
-                    ...Object.values(candidatoUpdateData)
-                )
-                candidato.save()
-                    .then((result) => {
-                        const cuerpo = `Recibimos una solicitud de cambio de contraseña, haz click en el siguiente enlace: \n ` + `http://${process.env.APP_HOST}/reset-password/${passwordResetHashGenerado}` + `\n\n*** ESTE ES UN EMAIL GENERADO AUTOMÁTICAMENTE. NO RESPONDA  AL MISMO ***`;
-                        const candidatoId = candidatoResult._id
-                        const mailer = new Mailer(
-                            'RESETPASS', direccion, candidatoId, cuerpo
-                        );
-
-                        mailer.save()
-                            .then((result) => {
-                                res.status(200).json(result);
-                            }).catch((err) => {
-                                console.log('error mailer', err);
-                                res.status(500).json({
-                                    success: false,
-                                    message: "Error de comunicación",
-                                });
-                            });
-                    }).catch((err) => {
-                        console.log('error', err);
-                        res.status(500).json({
-                            success: false,
-                            message: "Error de comunicación",
-                        });
-                    });
-
-
-            } else {
-                res.status(500).json({
-                    success: false,
-                    message: "Email inválido",
-                });
-            }
-        }).catch((err) => {
-            console.log('err1', err)
-            res.status(500).json({
-                success: false,
-                message: "Error de comunicación",
-            });
-        });
-};
+export  {
+  registerMailerActivateAccount,
+  registerMailerResetPass
+}

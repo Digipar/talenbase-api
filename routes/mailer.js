@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const mailerController = require('../controllers/mailer');
-const { authJwt } = require('../middleware');
+import { Router } from 'express';
+import {registerMailerActivateAccount, registerMailerResetPass} from '../controllers/mailer.js'
 
-router.post('/register-mailer-reset-pass', mailerController.registerMailerResetPass);
-router.post('/register-mailer-activate-account', mailerController.registerMailerAcivateAccount);
+const mailerRouter = Router();
 
-router.use(function(req, res, next) {
+mailerRouter.post('/register-mailer-reset-pass', registerMailerResetPass);
+mailerRouter.post('/register-mailer-activate-account', registerMailerActivateAccount);
+
+mailerRouter.use(function(req, res, next) {
     console.log('error 404 por código inválido');
     res.status(404).send({success: false, message: 'Código inválido'});
-  });
-module.exports = router;
+});
+
+export default mailerRouter;
