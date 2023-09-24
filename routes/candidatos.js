@@ -12,7 +12,8 @@ import {
     getCandidatoReferenciaPersonal,
     updatePersonalReference,
     deletePersonalReference,
-    updateDepartments
+    updateDepartments,
+    updateCandidatoPassword
   } from "../controllers/candidatos.js";
 import { verifyToken } from '../middleware/authJwt.js';
 
@@ -33,7 +34,7 @@ candidatoRouter.delete('/delete-personal-reference/:id', [verifyToken], deletePe
 candidatoRouter.put('/update-departments', [verifyToken], updateDepartments);
 
 /* UPDATE CANDIDATO */
-// candidatoRouter.post('/update-password', updateCandidatoPassword);
+candidatoRouter.post('/update-password', updateCandidatoPassword);
 
 
 export default candidatoRouter

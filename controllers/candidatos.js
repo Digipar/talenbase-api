@@ -1,6 +1,8 @@
 import { SPR } from "../connection/connection.js";
 import { SHAREPOINT_API, SITE_URL } from "../config/config.js";
 import moment from "moment-timezone";
+import cryptoJs from "crypto-js";
+import bcrypt from "bcryptjs";
 
 export const getCandidato = async (req, res, next) => {
   try {
@@ -394,4 +396,93 @@ export const updateDepartments =  async(req,res)=>{
     console.log("error :>> ", error);
     res.status(500).json({ message: error.message });
   }
+};
+
+export const updateCandidatoPassword = async (req, res, next) => {
+  console.log('req.body', req.body)
+  // destructure, and check if email exists in sharepoint Candidato list
+  const fechaDDMMYYYY = new Date().toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  const { email, passwordResetHash, password } = req.body;
+  if(!email){
+    return res.status(200).json({
+      success: false,
+      message: "Email no recibido",
+    });
+  }
+  // 1- seek the user exists in the sharepoint list
+  let candidato;
+  try{
+    const result = await SPR.get(
+      SHAREPOINT_API +
+        `web/lists/GetByTitle(\'Candidato\')/items?$select=Id,NombreApellido&$filter=Email eq '${email}'`
+    );
+    if (result.body?.d?.results?.length) {
+      console.log('Candidato found: ', result.body.d.results[0])
+      candidato = result.body.d.results[0];
+    } else {
+      console.log('Candidato not found');
+      return res.status(200).json({
+        success: false,
+        message: "Email inválido",
+      });
+    }
+  }
+  
+  catch(error){
+    console.log('error', error);
+    return res.status(200).json({
+      success: false,
+      message: "Email inválido",
+    });
+  }
+  // 2- validate 
+  const hashedEmail = cryptoJs.MD5(`${email}${fechaDDMMYYYY}`).toString();
+  if(hashedEmail !== passwordResetHash){
+    return res.status(200).json({
+      success: false,
+      message: "Código inválido",
+    });
+  }
+  // 3- update password
+  const digest = await SPR.requestDigest(SITE_URL);
+  let body = {
+    __metadata: { type: "SP.Data.CandidatoListItem" },
+    Contrasenha: password
+  };
+
+  const reqOptions = {
+    headers: {
+      "X-RequestDigest": digest,
+      Accept: "application/json;odata=verbose",
+      "Content-Type": "application/json;odata=verbose",
+      "If-Match": "*",
+      "X-HTTP-Method": "MERGE",
+    },
+    body: body,
+  };
+  const result = await SPR.post(
+    `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items(${candidato.Id})`,
+    reqOptions
+  );
+  if (result.statusCode !== 204) {
+    console.log('result', result);
+    return res.status(200).json({
+      success: false,
+      message: "Contraseña no pudo ser cambiada. Intente nuevamente.",
+    });
+  // if (result.statusCode >= 400 && result.statusCode <= 500) {
+  //   throw new Error("Bad fetch response CandidatoUpdate", {
+  //     statusCode: result.statusCode,
+  //     statusMessage: result.statusMessage,
+  //   });
+  }
+  // 4- return success
+  return res.status(200).json({
+    success: true,
+    message: "Contraseña cambiada exitosamente",
+  });
 };
