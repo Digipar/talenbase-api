@@ -433,7 +433,7 @@ export const updateCandidatoPassword = async (req, res, next) => {
   }
   
   catch(error){
-    console.log('error', error);
+    console.log('error updateCandidatoPassword part 1', error);
     return res.status(200).json({
       success: false,
       message: "Email inválido",
