@@ -63,7 +63,6 @@ const findSolicitudAbierta = async (req, res) => {
         const filter =`FechaFinSeleccion ge '${moment().format('YYYY-MM-DD')}'`
         const solicitudesAbiertasArray = [];
         const url = `${SHAREPOINT_API}web/lists/GetByTitle(\'Solicitud\')/items?${selectString}${expandString}&$filter=${filter}`;
-        console.log("url findSolicitudAbierta",url   )
         await getSolicitudes(url, solicitudesAbiertasArray);
         res.status(200).json(solicitudesAbiertasArray);
     } catch (error) {
