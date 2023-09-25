@@ -420,8 +420,7 @@ export const updateCandidatoPassword = async (req, res, next) => {
       SHAREPOINT_API +
         `web/lists/GetByTitle(\'Candidato\')/items?$select=Id,NombreApellido&$filter=Email eq '${email}'`
     );
-    if (result.body?.d?.results?.length) {
-      console.log('Candidato found: ', result.body.d.results[0])
+    if (result.body?.d?.results?.length) { 
       candidato = result.body.d.results[0];
     } else {
       console.log('Candidato not found');
@@ -468,6 +467,7 @@ export const updateCandidatoPassword = async (req, res, next) => {
     `${SHAREPOINT_API}web/lists/GetByTitle('Candidato')/items(${candidato.Id})`,
     reqOptions
   );
+  console.log("updateCandidatoPassword result", result.statusCode)
   if (result.statusCode !== 204) {
     console.log('result', result);
     return res.status(200).json({
