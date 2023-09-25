@@ -28,6 +28,7 @@ const getSolicitudes = async (url, array) => {
             return array;
         }
     } catch (error) {
+        console.log("error getSolicitudes",error)
         throw new Error(error);
     }
 };
