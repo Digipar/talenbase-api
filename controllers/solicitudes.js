@@ -4,16 +4,34 @@ const selectString = `$select=*,AprobadoPorRRHH/UserName,AprobadoPorRRHH/LastNam
 const expandString = `&$expand=AprobadoPorRRHH,Encargado,ResponsableSeleccion,Departamento`;
 import moment from "moment";
 
-
-const getSolicitudes = async (url, array) => {
-    const result = await SPR.get(url); 
-    array.push(...result.body.d.results);
-    if (result.body.d.__next) {
-        await getSolicitudes(result.body.d.__next);
-    } else {
-        return array;
+const validateUrl = (url) => {
+    try {
+        new URL(url);
+        return true;
+    } catch (error) {
+        return false;
     }
 };
+
+
+const getSolicitudes = async (url, array) => {
+    try {
+        if (!validateUrl(url)) {
+            throw new Error('Invalid URL');
+        }
+        
+        const result = await SPR.get(url); 
+        array.push(...result.body.d.results);
+        if (result.body?.d?.__next) {
+            await getSolicitudes(result.body.d.__next);
+        } else {
+            return array;
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 
 const getAll = async (req, res) => {
     try {
