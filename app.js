@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import morgan from "morgan";
 import { PORT } from "./config/config.js";
 import authRouter from "./routes/auth.js";
 import {verifyToken} from "./middleware/authJwt.js";
@@ -13,6 +14,7 @@ import mailerRouter from "./routes/mailer.js";
 
 
 const app = express();
+app.use(morgan('dev'));
 app.use(cors());
 
 app.use(bodyParser.json()); 
