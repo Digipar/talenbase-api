@@ -162,6 +162,7 @@ export const updateAcademicData = async (req, res, next) => {
 export const updateLanguageData = async (req, res, next) => {
   try {
     const digest = await SPR.requestDigest(SITE_URL);
+    console.log("req.body.language",req.body.language)
     await req.body.language.forEach(async (idioma) => {
       let body = {
         __metadata: { type: "SP.Data.CandidatoIdiomaListItem" },
@@ -184,6 +185,7 @@ export const updateLanguageData = async (req, res, next) => {
         `${SHAREPOINT_API}web/lists/GetByTitle('CandidatoIdioma')/items(${idioma.id})`,
         reqOptions
       );
+      console.log("updateLanguageData result statusCode", result.statusCode)
       if (result.statusCode >= 400 && result.statusCode <= 500) {
         throw new Error("Bad fetch response CandidatoIdiomaUpdate", {
           statusCode: result.statusCode,
@@ -193,6 +195,7 @@ export const updateLanguageData = async (req, res, next) => {
     });
     res.status(200).json("OK");
   } catch (error) {
+    console.log("updateLanguageData error", error);
     res.status(500).json({ message: error.message });
   }
 };
