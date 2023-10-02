@@ -52,7 +52,7 @@ const register = async (req, res) => {
       `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title,Email,Contrasenha,Nacionalidad,FechaNacimiento,EstadoCivil,Telefono&$filter=Email eq '${req.body.email}'`
     );
     if (user.body?.d?.results?.length) {
-      return res.status(409).json({ message: "Candidato ya Existe" });
+      return res.status(409).json({ message: "Cuenta ya Existente" });
     }
 
 
