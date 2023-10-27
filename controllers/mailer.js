@@ -1,5 +1,5 @@
 import { SPR } from "../connection/connection.js";
-import { SHAREPOINT_API, SITE_URL, SENDGRID_API_KEY } from "../config/config.js";
+import { SHAREPOINT_API, SITE_URL, SENDGRID_API_KEY,NO_REPLY_EMAIL } from "../config/config.js";
 import sgMail from '@sendgrid/mail';
 import {getPasswordResetHtml, getPasswordResetText} from '../constants/index.js';
 
@@ -97,7 +97,7 @@ const registerMailerResetPass = async (req, res) => {
   // 2- send email
   const msg = {
     to: email,
-    from: 'noreply@digipar.com',
+    from: NO_REPLY_EMAIL,
     subject: 'Cambio de contraseña de AGROFERTIL [Talenbase]',
     text: getPasswordResetText(email),
     html: getPasswordResetHtml(email),
