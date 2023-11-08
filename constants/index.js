@@ -52,7 +52,7 @@ export const getPasswordResetHtml = (email) => {
   Equipo de soporte de ${EMPRESA}`;
 }
 
-export const getActivateAccountText = (email) => {ß
+export const getActivateAccountText = (email) => {
   const link = buildLinkActivate(email);
   return `
 Por favor use el siguiente link para activar su cuenta:

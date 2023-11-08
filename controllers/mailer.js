@@ -33,9 +33,7 @@ const registerMailerActivateAccount = async (req, res) => {
     console.log('error', error);
     return false;
   }
-  // 2- send email
-  if (result.body?.d?.results?.length) {
-    console.log('Candidato found: ', result.body.d.results[0])
+
     // 2- send email
     const msg = {
       to: email,
@@ -58,7 +56,7 @@ const registerMailerActivateAccount = async (req, res) => {
       success: true,
       message: "Email de activación de cuenta enviado",
     });
-  }     
+       
 }
 
 const registerMailerResetPass = async (req, res) => {
