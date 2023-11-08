@@ -1,11 +1,9 @@
 import cryptoJs from 'crypto-js';
 import { SPR } from "../connection/connection.js";
 import jsonwebtoken from 'jsonwebtoken';
-const { sign } = jsonwebtoken;
-const { AES, enc } = cryptoJs
-// const passwordKey = 'T@L3NB@S3'
+const { sign } = jsonwebtoken; 
 import { SHAREPOINT_API, SITE_URL, TOKEN_SECRET } from "../config/config.js";
-import md5 from "md5";
+
 
 
 const login = async (req, res) => {
@@ -15,8 +13,7 @@ const login = async (req, res) => {
       `web/lists/GetByTitle(\'Candidato\')/items?$select=*,Id,Title,NombreApellido,Email,Contrasenha&$filter=Email eq '${req.body.email}'`
     );
     if (result.body.d.results.length) {
-
-      // const decryptPass = AES.decrypt(req.body.password,passwordKey).toString(enc.Utf8) 
+ 
 
       if (req.body.password !== result.body.d.results[0].Contrasenha) {
         return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
